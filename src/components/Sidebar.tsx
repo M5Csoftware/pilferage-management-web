@@ -13,7 +13,8 @@ import {
   LogOut, 
   Building2, 
   Radio, 
-  X
+  X,
+  ChevronRight
 } from 'lucide-react';
 import { AuthUser, PermissionKey } from '@/types/shipment';
 
@@ -44,6 +45,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     id: NavTab; 
     permissionKey: PermissionKey;
     label: string; 
+    subtitle: string;
     icon: React.ReactNode; 
     badge?: number | string; 
   }[] = [
@@ -51,44 +53,51 @@ export const Sidebar: React.FC<SidebarProps> = ({
       id: 'dashboard',
       permissionKey: 'dashboard',
       label: 'Dashboard & Tally',
-      icon: <LayoutDashboard className="w-5 h-5 stroke-[1.75]" />,
+      subtitle: 'Overview & cargo discrepancy stats',
+      icon: <LayoutDashboard className="w-5 h-5 stroke-[2]" />,
       badge: pilferageCount > 0 ? `${pilferageCount} Alert` : undefined,
     },
     {
       id: 'inbound',
       permissionKey: 'inbound',
       label: 'AWB Weight In',
-      icon: <PackagePlus className="w-5 h-5 stroke-[1.75]" />,
+      subtitle: 'Intake station & baseline weight',
+      icon: <PackagePlus className="w-5 h-5 stroke-[2]" />,
     },
     {
       id: 'dispatch',
       permissionKey: 'dispatch',
       label: 'Weight Out & Gate Check',
-      icon: <Truck className="w-5 h-5 stroke-[1.75]" />,
+      subtitle: 'Exit scale & anti-theft verify',
+      icon: <Truck className="w-5 h-5 stroke-[2]" />,
     },
     {
       id: 'audit',
       permissionKey: 'audit',
       label: 'Audit & Weight Ledger',
-      icon: <ClipboardList className="w-5 h-5 stroke-[1.75]" />,
+      subtitle: 'Consignment chain-of-custody',
+      icon: <ClipboardList className="w-5 h-5 stroke-[2]" />,
     },
     {
       id: 'report',
       permissionKey: 'report',
-      label: 'Master Report',
-      icon: <FileSpreadsheet className="w-5 h-5 stroke-[1.75]" />,
+      label: 'Master Cargo Report',
+      subtitle: 'Compliance, PDF & CSV export',
+      icon: <FileSpreadsheet className="w-5 h-5 stroke-[2]" />,
     },
     {
       id: 'permissions',
       permissionKey: 'permissions',
       label: 'Permission Management',
-      icon: <ShieldCheck className="w-5 h-5 stroke-[1.75]" />,
+      subtitle: 'Manage user accounts & modules',
+      icon: <ShieldCheck className="w-5 h-5 stroke-[2]" />,
     },
     {
       id: 'settings',
       permissionKey: 'settings',
       label: 'Password Reset',
-      icon: <SettingsIcon className="w-5 h-5 stroke-[1.75]" />,
+      subtitle: 'Terminal account security',
+      icon: <SettingsIcon className="w-5 h-5 stroke-[2]" />,
     }
   ];
 
@@ -107,26 +116,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
         />
       )}
 
-      {/* Sidebar with mobile drawer responsiveness (max-w-[85vw]) */}
+      {/* Sidebar: Responsive slide-in on mobile (85vw max 380px) and static w-72 on desktop */}
       <aside className={`
-        fixed top-0 bottom-0 left-0 z-50 w-72 sm:w-80 max-w-[85vw] bg-white border-r border-[#ebdcd0] shadow-xl lg:shadow-none flex flex-col justify-between transition-transform duration-300 ease-in-out lg:translate-x-0
+        fixed top-0 bottom-0 left-0 z-50 w-[85vw] max-w-[360px] lg:w-72 bg-white border-r border-[#ebdcd0] shadow-2xl lg:shadow-none flex flex-col justify-between transition-transform duration-300 ease-in-out lg:translate-x-0
         ${isOpenMobile ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
-        <div className="overflow-y-auto no-scrollbar flex-1">
+        <div className="overflow-y-auto no-scrollbar flex-1 flex flex-col">
           {/* Top Branding Section */}
-          <div className="h-18 sm:h-20 px-5 sm:px-6 border-b border-[#ebdcd0] flex items-center justify-between sticky top-0 bg-white z-10">
+          <div className="h-18 px-5 sm:px-6 border-b border-[#ebdcd0] flex items-center justify-between sticky top-0 bg-white z-10">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-[#6E3511] flex items-center justify-center text-white shadow-xs shrink-0">
                 <Scale className="w-5 h-5 stroke-[2]" />
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="font-extrabold text-[#412D15] tracking-tight text-lg">PMS GATE</span>
-                  <span className="text-[10px] sm:text-[11px] font-bold px-1.5 py-0.5 rounded bg-[#6E3511]/10 text-[#6E3511] border border-[#6E3511]/25 uppercase tracking-wide">
+                  <span className="font-black text-[#412D15] tracking-tight text-lg">PMS GATE</span>
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#6E3511]/10 text-[#6E3511] border border-[#6E3511]/25 uppercase tracking-wide">
                     Cargo
                   </span>
                 </div>
-                <div className="text-xs text-[#412D15]/70 font-normal truncate mt-0.5">
+                <div className="text-xs text-[#412D15]/70 font-medium truncate">
                   Pilferage Management System
                 </div>
               </div>
@@ -134,34 +143,51 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
             <button 
               onClick={onCloseMobile}
-              className="lg:hidden w-9 h-9 flex items-center justify-center text-[#412D15]/70 hover:text-[#412D15] hover:bg-[#faf6f2] rounded-xl transition shrink-0 ml-1"
-              aria-label="Close sidebar"
+              className="lg:hidden w-10 h-10 flex items-center justify-center text-[#412D15] hover:bg-[#faf6f2] active:bg-[#ebdcd0] rounded-xl transition shrink-0"
+              aria-label="Close menu"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Terminal status bar */}
-          <div className="px-5 sm:px-6 py-3 border-b border-[#ebdcd0] bg-[#faf6f2]">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-[#412D15]/75 flex items-center gap-1.5 font-medium">
-                <Building2 className="w-3.5 h-3.5 text-[#6E3511]" /> Terminal:
-              </span>
-              <span className="font-mono text-xs font-bold text-[#412D15]">HUB-DEL-04</span>
+          {/* User Profile Card (Prominent at top of drawer on mobile) */}
+          <div className="p-4 border-b border-[#ebdcd0] bg-[#faf6f2]">
+            <div className="flex items-center gap-3">
+              <div className={`w-11 h-11 rounded-xl flex items-center justify-center font-black text-base shrink-0 shadow-2xs ${
+                isAdmin 
+                  ? 'bg-[#6E3511] text-white' 
+                  : 'bg-[#412D15]/15 text-[#412D15]'
+              }`}>
+                {currentUser.name.charAt(0)}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-sm font-bold text-[#412D15] truncate">@{currentUser.username}</span>
+                  <span className={`text-[10px] font-mono font-bold px-1.5 py-0.2 rounded uppercase ${
+                    isAdmin ? 'bg-[#6E3511] text-white' : 'bg-[#ebdcd0] text-[#412D15]'
+                  }`}>
+                    {currentUser.role}
+                  </span>
+                </div>
+                <div className="text-xs text-[#412D15]/70 truncate font-medium">
+                  {currentUser.name}
+                </div>
+              </div>
             </div>
-            <div className="flex items-center justify-between text-xs mt-1.5">
-              <span className="text-[#412D15]/75 flex items-center gap-1.5 font-medium">
-                <Radio className="w-3.5 h-3.5 text-emerald-600" /> Digital Scale:
+
+            <div className="mt-2.5 pt-2 border-t border-[#ebdcd0]/70 flex items-center justify-between text-[11px] text-[#412D15]/75">
+              <span className="flex items-center gap-1">
+                <Building2 className="w-3.5 h-3.5 text-[#6E3511]" /> HUB-DEL-04
               </span>
-              <span className="text-emerald-700 font-mono text-[11px] font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                Connected
+              <span className="flex items-center gap-1 font-semibold text-emerald-700">
+                <Radio className="w-3.5 h-3.5 text-emerald-600" /> Scale Connected
               </span>
             </div>
           </div>
 
-          {/* Navigation Items */}
-          <nav className="p-3 sm:p-4 space-y-1">
-            <div className="px-3 py-2 text-xs font-bold text-[#412D15]/60 uppercase tracking-wider flex items-center justify-between">
+          {/* Navigation Items (Touch friendly 52px items) */}
+          <nav className="p-3 sm:p-4 space-y-1.5 flex-1">
+            <div className="px-3 py-1.5 text-xs font-bold text-[#412D15]/60 uppercase tracking-wider flex items-center justify-between">
               <span>Navigation Menu</span>
               <span className="font-mono text-[11px] text-[#6E3511] font-semibold">{navItems.length} modules</span>
             </div>
@@ -178,58 +204,48 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     onCloseMobile();
                   }}
                   className={`
-                    w-full flex items-center justify-between px-3.5 sm:px-4 py-3 rounded-xl text-sm font-bold transition min-h-[46px]
+                    w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-left transition min-h-[50px]
                     ${isActive 
                       ? 'bg-[#6E3511] text-white shadow-xs' 
-                      : 'text-[#412D15]/85 hover:bg-[#faf5f0] hover:text-[#412D15] active:bg-[#f6eee7]'
+                      : 'text-[#412D15] hover:bg-[#faf5f0] active:bg-[#f6eee7]'
                     }
                   `}
                 >
-                  <div className="flex items-center gap-3">
-                    <span className={isActive ? 'text-white' : 'text-[#6E3511]'}>
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className={`shrink-0 ${isActive ? 'text-white' : 'text-[#6E3511]'}`}>
                       {item.icon}
                     </span>
-                    <span className="truncate">{item.label}</span>
+                    <div className="min-w-0">
+                      <div className="text-sm font-bold truncate leading-tight">{item.label}</div>
+                      <div className={`text-[11px] truncate leading-tight mt-0.5 ${isActive ? 'text-amber-100/90' : 'text-[#412D15]/60'}`}>
+                        {item.subtitle}
+                      </div>
+                    </div>
                   </div>
 
-                  {item.badge && (
-                    <span className={`text-xs font-bold px-2 py-0.5 rounded-full shrink-0 ml-2 ${
-                      isAlert 
-                        ? isActive ? 'bg-rose-500 text-white' : 'bg-rose-100 text-rose-700 border border-rose-200' 
-                        : isActive ? 'bg-white/20 text-white' : 'bg-[#6E3511]/15 text-[#6E3511]'
-                    }`}>
-                      {item.badge}
-                    </span>
-                  )}
+                  <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                    {item.badge && (
+                      <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
+                        isAlert 
+                          ? isActive ? 'bg-rose-500 text-white' : 'bg-rose-100 text-rose-700 border border-rose-200' 
+                          : isActive ? 'bg-white/20 text-white' : 'bg-[#6E3511]/15 text-[#6E3511]'
+                      }`}>
+                        {item.badge}
+                      </span>
+                    )}
+                    <ChevronRight className={`w-4 h-4 ${isActive ? 'text-white/70' : 'text-[#412D15]/30'}`} />
+                  </div>
                 </button>
               );
             })}
           </nav>
         </div>
 
-        {/* User Card & Sign Out (Sticky at bottom) */}
-        <div className="p-3 sm:p-4 border-t border-[#ebdcd0] bg-[#faf6f2]">
-          <div className="p-3 rounded-xl bg-white border border-[#ebdcd0] shadow-2xs mb-2">
-            <div className="flex items-center gap-2.5">
-              <div className={`w-9 h-9 rounded-lg flex items-center justify-center font-bold text-sm shrink-0 ${
-                isAdmin 
-                  ? 'bg-[#6E3511] text-white' 
-                  : 'bg-[#412D15]/10 text-[#412D15]'
-              }`}>
-                {currentUser.name.charAt(0)}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-bold text-[#412D15] truncate">@{currentUser.username}</div>
-                <div className="text-xs text-[#412D15]/70 font-medium truncate">
-                  {currentUser.role} • {currentUser.name}
-                </div>
-              </div>
-            </div>
-          </div>
-
+        {/* Sign Out (Sticky at bottom) */}
+        <div className="p-3 sm:p-4 border-t border-[#ebdcd0] bg-[#faf6f2] pb-safe">
           <button
             onClick={onLogout}
-            className="w-full flex items-center justify-center gap-2 py-2.5 px-3 text-xs font-bold text-rose-700 hover:text-rose-800 hover:bg-rose-50 active:bg-rose-100 rounded-xl transition border border-rose-200/80 min-h-[42px]"
+            className="w-full flex items-center justify-center gap-2 py-3 px-4 text-xs font-bold text-rose-700 hover:text-rose-800 hover:bg-rose-50 active:bg-rose-100 rounded-xl transition border border-rose-200/80 min-h-[46px] shadow-2xs"
           >
             <LogOut className="w-4 h-4" />
             <span>Sign Out Session</span>
