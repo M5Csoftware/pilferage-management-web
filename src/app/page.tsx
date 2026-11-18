@@ -31,6 +31,14 @@ import { MasterReport } from '@/components/MasterReport';
 import { PermissionManagement } from '@/components/PermissionManagement';
 import { SettingsView } from '@/components/SettingsView';
 import { WeightComparisonCard } from '@/components/WeightComparisonCard';
+import { 
+  isSupabaseConfigured, 
+  getShipmentsFromDb, 
+  insertShipmentToDb, 
+  updateShipmentInDb, 
+  getUserAccountsFromDb, 
+  upsertUserAccountInDb 
+} from '@/lib/supabase';
 
 export default function Home() {
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
@@ -97,6 +105,21 @@ export default function Home() {
         setSettings(DEFAULT_SETTINGS);
       }
     }
+
+    // Connect to Supabase live database if configured
+    if (isSupabaseConfigured) {
+      getUserAccountsFromDb().then(dbAccounts => {
+        if (dbAccounts && dbAccounts.length > 0) {
+          setAccounts(dbAccounts);
+        }
+      });
+
+      getShipmentsFromDb().then(dbShipments => {
+        if (dbShipments && dbShipments.length > 0) {
+          setShipments(dbShipments);
+        }
+      });
+    }
   }, []);
 
   const handleLoginSuccess = (user: AuthUser) => {
@@ -116,6 +139,10 @@ export default function Home() {
   const handleUpdateAccounts = (newAccounts: UserAccount[]) => {
     setAccounts(newAccounts);
     localStorage.setItem('PMS_ACCOUNTS_V3', JSON.stringify(newAccounts));
+
+    if (isSupabaseConfigured) {
+      newAccounts.forEach(acc => upsertUserAccountInDb(acc));
+    }
 
     if (currentUser) {
       const me = newAccounts.find(a => a.id === currentUser.id);
@@ -149,6 +176,9 @@ export default function Home() {
   const handleShipmentRecorded = (newShipment: Shipment) => {
     const updated = [newShipment, ...shipments];
     saveShipments(updated);
+    if (isSupabaseConfigured) {
+      insertShipmentToDb(newShipment);
+    }
     if (currentUser?.permissions?.dispatch) {
       setActiveTab('dispatch');
     }
@@ -157,6 +187,9 @@ export default function Home() {
   const handleUpdateShipment = (updatedShipment: Shipment) => {
     const updated = shipments.map((s) => (s.id === updatedShipment.id ? updatedShipment : s));
     saveShipments(updated);
+    if (isSupabaseConfigured) {
+      updateShipmentInDb(updatedShipment);
+    }
   };
 
   const resetToSampleData = () => {
@@ -241,6 +274,13 @@ export default function Home() {
                 <span className="sm:hidden font-mono">{pilferageCount}</span>
               </button>
             )}
+
+            <div className="hidden xs:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#faf6f2] border border-[#ebdcd0] text-xs font-semibold">
+              <span className={`w-2 h-2 rounded-full ${isSupabaseConfigured ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+              <span className="text-[11px] font-mono text-[#412D15]">
+                {isSupabaseConfigured ? 'Supabase' : 'Offline'}
+              </span>
+            </div>
 
             <button
               onClick={resetToSampleData}

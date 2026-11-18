@@ -144,6 +144,10 @@ export interface Shipment {
   weightDiffKg?: number;
   weightLossPercentage?: number;
   flaggedReason?: string;
+
+  // Photo Evidence
+  weightInPhotoUrl?: string;
+  weightOutPhotoUrl?: string;
 }
 
 export interface MasterTallySummary {
