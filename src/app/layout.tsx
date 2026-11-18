@@ -1,20 +1,24 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-mono",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "PMS - Pilferage Management System",
-  description: "Cross-checks shipment inbound vs outbound weights to detect and prevent theft before dispatch.",
+  title: "PMS - Pilferage Management System | Air Freight & Logistics Gate",
+  description: "Cross-checks shipment inbound vs outbound weights to detect and prevent cargo theft before dispatch.",
   icons: {
     icon: "/favicon.ico",
   },
@@ -23,8 +27,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
-  themeColor: "#020617",
+  maximumScale: 5,
+  themeColor: "#6E3511",
 };
 
 export default function RootLayout({
@@ -33,11 +37,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased dark`}
-    >
-      <body className="min-h-full flex flex-col bg-slate-950 text-slate-100">{children}</body>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}>
+      <body className="min-h-full flex flex-col bg-[#faf8f5] text-[#412D15] overflow-x-hidden">{children}</body>
     </html>
   );
 }

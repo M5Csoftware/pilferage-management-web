@@ -6,23 +6,22 @@ import {
   CheckCircle2, 
   Clock, 
   Search, 
-  Filter, 
-  FileSpreadsheet,
   AlertTriangle,
   Scale,
-  Eye,
-  ArrowUpDown
+  Eye
 } from 'lucide-react';
-import { Shipment } from '@/types/shipment';
+import { Shipment, AuthUser } from '@/types/shipment';
 
 interface ShipmentAuditListProps {
   shipments: Shipment[];
   onSelectShipment?: (shipment: Shipment) => void;
+  currentUser: AuthUser;
 }
 
 export const ShipmentAuditList: React.FC<ShipmentAuditListProps> = ({ 
   shipments,
-  onSelectShipment 
+  onSelectShipment,
+  currentUser
 }) => {
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
   const [search, setSearch] = useState<string>('');
@@ -35,62 +34,64 @@ export const ShipmentAuditList: React.FC<ShipmentAuditListProps> = ({
       filterStatus === 'INBOUND' ? s.status === 'INBOUND_RECORDED' : true;
 
     const matchesSearch = 
-      s.trackingNumber.toLowerCase().includes(search.toLowerCase()) ||
+      s.awbNumber.toLowerCase().includes(search.toLowerCase()) ||
       s.id.toLowerCase().includes(search.toLowerCase()) ||
       s.senderName.toLowerCase().includes(search.toLowerCase()) ||
       s.recipientName.toLowerCase().includes(search.toLowerCase()) ||
-      s.category.toLowerCase().includes(search.toLowerCase());
+      s.category.toLowerCase().includes(search.toLowerCase()) ||
+      s.origin.toLowerCase().includes(search.toLowerCase()) ||
+      s.destination.toLowerCase().includes(search.toLowerCase());
 
     return matchesFilter && matchesSearch;
   });
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+    <div className="bg-white border border-[#ebdcd0] rounded-2xl p-6 md:p-8 shadow-xs text-[#412D15]">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-5 border-b border-[#ebdcd0]">
         <div>
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <Scale className="w-5 h-5 text-blue-400" />
+          <h2 className="text-xl md:text-2xl font-black text-[#412D15] flex items-center gap-3">
+            <Scale className="w-6 h-6 text-[#6E3511] stroke-[2]" />
             Consolidated Weight & Pilferage Audit Log
           </h2>
-          <p className="text-sm text-slate-400 mt-1">
-            Complete chain-of-custody ledger comparing Inbound Weight vs Outbound Dispatch Weight.
+          <p className="text-sm md:text-base text-[#412D15]/70 font-normal mt-1">
+            Complete chain-of-custody ledger comparing arrival baseline vs departure weight.
           </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
           {/* Status Filters */}
-          <div className="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
+          <div className="flex items-center bg-[#faf6f2] p-1.5 rounded-xl border border-[#ebdcd0] text-xs md:text-sm overflow-x-auto w-full sm:w-auto">
             <button
               onClick={() => setFilterStatus('ALL')}
-              className={`px-3 py-1.5 rounded-lg font-medium transition ${
-                filterStatus === 'ALL' ? 'bg-slate-800 text-white' : 'text-slate-400 hover:text-white'
+              className={`px-3.5 py-1.5 rounded-lg font-bold whitespace-nowrap transition ${
+                filterStatus === 'ALL' ? 'bg-[#6E3511] text-white shadow-xs' : 'text-[#412D15]/80 hover:text-[#412D15]'
               }`}
             >
               All ({shipments.length})
             </button>
             <button
               onClick={() => setFilterStatus('FLAGGED')}
-              className={`px-3 py-1.5 rounded-lg font-medium transition flex items-center gap-1 ${
+              className={`px-3.5 py-1.5 rounded-lg font-bold whitespace-nowrap transition flex items-center gap-1.5 ${
                 filterStatus === 'FLAGGED' 
-                  ? 'bg-red-500/20 text-red-300 border border-red-500/40' 
-                  : 'text-slate-400 hover:text-red-400'
+                  ? 'bg-rose-100 text-rose-800 border border-rose-200' 
+                  : 'text-[#412D15]/80 hover:text-rose-700'
               }`}
             >
-              <AlertTriangle className="w-3 h-3 text-red-400" />
+              <AlertTriangle className="w-4 h-4 text-rose-600" />
               Pilfered ({shipments.filter(s => s.status === 'PILFERAGE_FLAGGED').length})
             </button>
             <button
               onClick={() => setFilterStatus('CLEARED')}
-              className={`px-3 py-1.5 rounded-lg font-medium transition ${
-                filterStatus === 'CLEARED' ? 'bg-emerald-500/20 text-emerald-300' : 'text-slate-400 hover:text-white'
+              className={`px-3.5 py-1.5 rounded-lg font-bold whitespace-nowrap transition ${
+                filterStatus === 'CLEARED' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'text-[#412D15]/80 hover:text-emerald-700'
               }`}
             >
               Cleared ({shipments.filter(s => s.status === 'DISPATCHED_CLEARED').length})
             </button>
             <button
               onClick={() => setFilterStatus('INBOUND')}
-              className={`px-3 py-1.5 rounded-lg font-medium transition ${
-                filterStatus === 'INBOUND' ? 'bg-sky-500/20 text-sky-300' : 'text-slate-400 hover:text-white'
+              className={`px-3.5 py-1.5 rounded-lg font-bold whitespace-nowrap transition ${
+                filterStatus === 'INBOUND' ? 'bg-[#ebdcd0] text-[#412D15]' : 'text-[#412D15]/80 hover:text-[#412D15]'
               }`}
             >
               Pending Out ({shipments.filter(s => s.status === 'INBOUND_RECORDED').length})
@@ -100,37 +101,116 @@ export const ShipmentAuditList: React.FC<ShipmentAuditListProps> = ({
       </div>
 
       {/* Search Bar */}
-      <div className="mb-4">
+      <div className="mb-6">
         <div className="relative">
           <input
             type="text"
-            placeholder="Search across tracking numbers, consignors, consignees, categories..."
+            placeholder="Search across AWB #, tracking numbers, consignors, cities..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-slate-950 text-white border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:border-blue-500 focus:outline-none"
+            className="w-full bg-[#faf6f2] text-[#412D15] border border-[#ebdcd0] rounded-xl pl-11 pr-4 py-3 text-sm md:text-base focus:border-[#6E3511] focus:bg-white focus:outline-none transition"
           />
-          <Search className="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5" />
+          <Search className="w-5 h-5 text-[#6E3511]/60 absolute left-3.5 top-3.5" />
         </div>
       </div>
 
-      {/* Responsive Data Table */}
-      <div className="overflow-x-auto rounded-xl border border-slate-800">
+      {/* Mobile Card List */}
+      <div className="block lg:hidden space-y-4">
+        {filtered.length === 0 ? (
+          <div className="p-8 text-center text-[#412D15]/60 text-sm border border-[#ebdcd0] rounded-xl bg-[#faf6f2]">
+            No shipments found matching criteria.
+          </div>
+        ) : (
+          filtered.map((item) => {
+            const isFlagged = item.status === 'PILFERAGE_FLAGGED';
+            const isCleared = item.status === 'DISPATCHED_CLEARED';
+            const isPending = item.status === 'INBOUND_RECORDED';
+
+            return (
+              <div 
+                key={item.id}
+                onClick={() => onSelectShipment?.(item)}
+                className={`p-5 rounded-xl border text-sm space-y-3 cursor-pointer transition shadow-2xs ${
+                  isFlagged 
+                    ? 'bg-rose-50/70 border-rose-300' 
+                    : 'bg-white border-[#ebdcd0] hover:border-[#dfcebf]'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-mono font-bold text-[#412D15] text-sm">
+                    {item.awbNumber}
+                  </span>
+                  <div>
+                    {isFlagged && (
+                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-200">
+                        FLAGGED
+                      </span>
+                    )}
+                    {isCleared && (
+                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                        CLEARED
+                      </span>
+                    )}
+                    {isPending && (
+                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#faf6f2] text-[#412D15] border border-[#ebdcd0]">
+                        PENDING
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="text-[#412D15] font-semibold truncate">
+                  {item.senderName} → {item.recipientName}
+                </div>
+
+                <div className="grid grid-cols-3 gap-3 bg-[#faf6f2] p-3 rounded-lg border border-[#ebdcd0] font-mono text-center">
+                  <div>
+                    <span className="text-[#412D15]/60 block text-[10px] uppercase font-sans font-bold">Inbound</span>
+                    <span className="text-[#412D15] font-bold">{item.weightInKg.toFixed(2)} kg</span>
+                  </div>
+                  <div>
+                    <span className="text-[#412D15]/60 block text-[10px] uppercase font-sans font-bold">Outbound</span>
+                    <span className="text-[#412D15] font-bold">
+                      {item.weightOutKg !== undefined ? `${item.weightOutKg.toFixed(2)} kg` : '—'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[#412D15]/60 block text-[10px] uppercase font-sans font-bold">Variance</span>
+                    <span className={`font-black ${isFlagged ? 'text-rose-600' : 'text-emerald-700'}`}>
+                      {item.weightDiffKg !== undefined ? `${item.weightDiffKg > 0 ? `+${item.weightDiffKg}` : item.weightDiffKg} kg` : '—'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-xs text-[#412D15]/60 pt-1">
+                  <span>{item.category} • Tol: ±{item.tolerancePercentage}%</span>
+                  <span className="text-[#6E3511] font-bold">Inspect Details →</span>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* Responsive Table for Desktop */}
+      <div className="hidden lg:block overflow-x-auto rounded-xl border border-[#ebdcd0]">
         <table className="w-full text-left text-sm">
-          <thead className="bg-slate-950 text-slate-400 text-xs uppercase tracking-wider border-b border-slate-800">
+          <thead className="bg-[#faf6f2] text-[#412D15] uppercase tracking-wider border-b border-[#ebdcd0] font-bold text-xs">
             <tr>
-              <th className="px-4 py-3.5">Shipment & Consignor</th>
-              <th className="px-4 py-3.5">Category</th>
-              <th className="px-4 py-3.5">Weight In (Arrival)</th>
-              <th className="px-4 py-3.5">Weight Out (Dispatch)</th>
-              <th className="px-4 py-3.5">Variance (Loss/Gain)</th>
-              <th className="px-4 py-3.5">Security Status</th>
-              <th className="px-4 py-3.5 text-right">Action</th>
+              <th className="px-5 py-4">AWB & Shipment</th>
+              <th className="px-5 py-4">Route</th>
+              <th className="px-5 py-4">Category</th>
+              <th className="px-5 py-4 text-right">Inbound (kg)</th>
+              <th className="px-5 py-4 text-right">Outbound (kg)</th>
+              <th className="px-5 py-4 text-right">Variance</th>
+              <th className="px-5 py-4">Status</th>
+              <th className="px-5 py-4 text-right">Action</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/80 bg-slate-900/50">
+          <tbody className="divide-y divide-[#ebdcd0]/70 bg-white text-[#412D15] font-medium">
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-slate-500">
+                <td colSpan={8} className="px-5 py-10 text-center text-[#412D15]/60">
                   No shipments found matching criteria.
                 </td>
               </tr>
@@ -143,91 +223,70 @@ export const ShipmentAuditList: React.FC<ShipmentAuditListProps> = ({
                 return (
                   <tr 
                     key={item.id}
-                    className={`transition hover:bg-slate-800/40 ${
-                      isFlagged ? 'bg-red-950/20' : ''
+                    className={`transition hover:bg-[#faf6f2] ${
+                      isFlagged ? 'bg-rose-50/50' : ''
                     }`}
                   >
-                    <td className="px-4 py-3.5">
-                      <div className="font-mono font-bold text-white text-xs">{item.id}</div>
-                      <div className="text-xs text-slate-300 font-medium">{item.senderName}</div>
-                      <div className="text-[11px] text-slate-500">{item.trackingNumber}</div>
+                    <td className="px-5 py-4">
+                      <div className="font-mono font-bold text-[#412D15] text-sm">{item.awbNumber}</div>
+                      <div className="text-xs text-[#412D15]/75 font-medium">{item.senderName}</div>
+                      <div className="text-[11px] text-[#412D15]/50 font-mono">{item.id}</div>
                     </td>
 
-                    <td className="px-4 py-3.5">
-                      <span className="text-xs px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700/60">
+                    <td className="px-5 py-4 text-xs text-[#412D15]/75">
+                      <div>{item.origin}</div>
+                      <div className="text-[#412D15]/50">→ {item.destination}</div>
+                    </td>
+
+                    <td className="px-5 py-4">
+                      <span className="px-2.5 py-1 rounded bg-[#faf6f2] text-[#412D15] border border-[#ebdcd0] text-xs font-semibold">
                         {item.category}
                       </span>
-                      <div className="text-[11px] text-slate-500 mt-1">
-                        Tol: ±{item.tolerancePercentage}%
-                      </div>
                     </td>
 
-                    <td className="px-4 py-3.5">
-                      <div className="font-bold text-sky-400 font-mono text-sm">
-                        {item.weightInKg.toFixed(2)} kg
-                      </div>
-                      <div className="text-[11px] text-slate-500">
-                        {item.inboundDate.split(' ')[0]}
-                      </div>
+                    <td className="px-5 py-4 text-right font-mono font-bold text-[#412D15] text-base">
+                      {item.weightInKg.toFixed(2)}
                     </td>
 
-                    <td className="px-4 py-3.5">
-                      {item.weightOutKg !== undefined ? (
-                        <div>
-                          <div className="font-bold text-indigo-400 font-mono text-sm">
-                            {item.weightOutKg.toFixed(2)} kg
-                          </div>
-                          <div className="text-[11px] text-slate-500">
-                            {item.outboundDate?.split(' ')[0]}
-                          </div>
-                        </div>
-                      ) : (
-                        <span className="text-xs text-slate-500 italic">Pending Re-weigh</span>
-                      )}
+                    <td className="px-5 py-4 text-right font-mono font-bold text-[#412D15] text-base">
+                      {item.weightOutKg !== undefined ? item.weightOutKg.toFixed(2) : '—'}
                     </td>
 
-                    <td className="px-4 py-3.5">
+                    <td className="px-5 py-4 text-right font-mono">
                       {item.weightDiffKg !== undefined ? (
-                        <div className="flex items-center gap-1.5">
-                          <span className={`font-mono font-bold text-xs px-2 py-0.5 rounded ${
-                            isFlagged 
-                              ? 'bg-red-500/20 text-red-300 border border-red-500/40' 
-                              : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
-                          }`}>
-                            {item.weightDiffKg > 0 ? `+${item.weightDiffKg}` : item.weightDiffKg} kg
-                          </span>
-                          <span className="text-[11px] text-slate-400">
-                            ({item.weightLossPercentage}%)
-                          </span>
-                        </div>
+                        <span className={`font-black text-sm ${
+                          isFlagged ? 'text-rose-600' : 'text-emerald-700'
+                        }`}>
+                          {item.weightDiffKg > 0 ? `+${item.weightDiffKg}` : item.weightDiffKg} kg ({item.weightLossPercentage}%)
+                        </span>
                       ) : (
-                        <span className="text-xs text-slate-600">—</span>
+                        <span className="text-[#412D15]/50">—</span>
                       )}
                     </td>
 
-                    <td className="px-4 py-3.5">
+                    <td className="px-5 py-4">
                       {isFlagged && (
-                        <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-red-500/20 text-red-400 border border-red-500/40">
-                          <ShieldAlert className="w-3.5 h-3.5" /> Pilferage Flagged
+                        <span className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full bg-rose-100 text-rose-800 border border-rose-200">
+                          <ShieldAlert className="w-3.5 h-3.5" /> Flagged
                         </span>
                       )}
                       {isCleared && (
-                        <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
-                          <CheckCircle2 className="w-3.5 h-3.5" /> Dispatched Cleared
+                        <span className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Cleared
                         </span>
                       )}
                       {isPending && (
-                        <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full bg-sky-500/20 text-sky-400 border border-sky-500/40">
-                          <Clock className="w-3.5 h-3.5" /> Inbound Recorded
+                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-[#faf6f2] text-[#412D15] border border-[#ebdcd0]">
+                          <Clock className="w-3.5 h-3.5 text-[#6E3511]" /> Intake Logged
                         </span>
                       )}
                     </td>
 
-                    <td className="px-4 py-3.5 text-right">
+                    <td className="px-5 py-4 text-right">
                       {onSelectShipment && (
                         <button
                           onClick={() => onSelectShipment(item)}
-                          className="text-xs text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 px-2.5 py-1.5 rounded-lg border border-slate-700 inline-flex items-center gap-1 transition"
+                          className="text-xs text-[#412D15] hover:text-white bg-[#faf6f2] hover:bg-[#6E3511] px-3.5 py-1.5 rounded-lg border border-[#ebdcd0] inline-flex items-center gap-1.5 transition font-bold"
                         >
                           <Eye className="w-3.5 h-3.5" /> View
                         </button>

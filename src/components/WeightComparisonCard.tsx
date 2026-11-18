@@ -4,9 +4,6 @@ import {
   Scale, 
   CheckCircle2, 
   AlertTriangle, 
-  Package, 
-  ArrowRight,
-  TrendingDown,
   Info
 } from 'lucide-react';
 import { Shipment } from '@/types/shipment';
@@ -35,206 +32,205 @@ export const WeightComparisonCard: React.FC<WeightComparisonCardProps> = ({
   const exceedsTolerance = isWeightDeficit && absLossPercent > shipment.tolerancePercentage;
 
   const [notes, setNotes] = useState(shipment.outboundNotes || '');
-  const [operator, setOperator] = useState(shipment.outboundOperator || 'Current Station User');
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 md:p-6 shadow-xl relative overflow-hidden">
-      {/* Background ambient indicator */}
+    <div className="bg-white border border-[#ebdcd0] rounded-2xl p-6 md:p-8 relative overflow-hidden shadow-xs text-[#412D15]">
+      {/* Top indicator bar */}
       {exceedsTolerance && (
-        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-red-600 via-rose-500 to-amber-500 animate-pulse" />
+        <div className="absolute top-0 left-0 right-0 h-2 bg-rose-600 animate-pulse" />
       )}
       {!exceedsTolerance && currentWeightOut > 0 && (
-        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-500 to-teal-400" />
+        <div className="absolute top-0 left-0 right-0 h-2 bg-emerald-600" />
       )}
 
       {/* Header Info */}
-      <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b border-slate-800/80">
+      <div className="flex flex-wrap items-center justify-between gap-4 pb-5 border-b border-[#ebdcd0]">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-mono px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-xs font-mono font-bold px-2.5 py-1 rounded bg-[#faf6f2] text-[#412D15] border border-[#ebdcd0]">
               {shipment.id}
             </span>
-            <span className="text-xs text-slate-400">Tracking: {shipment.trackingNumber}</span>
+            <span className="text-sm font-mono text-[#412D15] font-bold">AWB: {shipment.awbNumber}</span>
           </div>
-          <h3 className="text-lg font-bold text-white mt-1">
-            {shipment.senderName} <span className="text-slate-500 text-sm">→</span> {shipment.recipientName}
+          <h3 className="text-base md:text-xl font-extrabold text-[#412D15] mt-2">
+            {shipment.senderName} <span className="text-[#6E3511] text-sm font-bold">→</span> {shipment.recipientName}
           </h3>
+          <div className="text-xs md:text-sm text-[#412D15]/70 mt-1">
+            {shipment.origin} to {shipment.destination}
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="text-xs bg-slate-800 text-slate-300 px-2.5 py-1 rounded-full border border-slate-700">
+        <div className="flex items-center gap-3">
+          <span className="text-xs bg-[#faf6f2] text-[#412D15] px-3 py-1.5 rounded-lg border border-[#ebdcd0] font-bold">
             {shipment.category}
           </span>
-          <span className="text-xs text-slate-400">
-            Max Tolerance: <strong className="text-amber-400">±{shipment.tolerancePercentage}%</strong>
+          <span className="text-xs text-[#412D15]/75 font-medium">
+            Tolerance: <strong className="text-[#6E3511] font-mono font-bold">±{shipment.tolerancePercentage}%</strong>
           </span>
         </div>
       </div>
 
       {/* Side-by-side weight metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 my-6">
         {/* Weight In */}
-        <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-4 flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-medium uppercase tracking-wider">
-            <span>Inbound Weight (Arrival)</span>
-            <Scale className="w-4 h-4 text-sky-400" />
+        <div className="bg-[#faf6f2] border border-[#ebdcd0] rounded-xl p-5 flex flex-col justify-between">
+          <div className="flex items-center justify-between text-[#412D15]/70 text-xs font-bold uppercase tracking-wider">
+            <span>Inbound (Arrival)</span>
+            <Scale className="w-5 h-5 text-[#6E3511]" />
           </div>
           <div className="my-3">
-            <span className="text-3xl font-extrabold text-white tracking-tight">
+            <span className="text-3xl md:text-4xl font-black text-[#412D15] tracking-tight font-mono">
               {shipment.weightInKg.toFixed(2)}
             </span>
-            <span className="text-slate-400 ml-1.5 font-medium text-sm">kg</span>
+            <span className="text-[#412D15]/60 ml-2 text-sm font-bold">kg</span>
           </div>
-          <div className="text-xs text-slate-500">
-            Operator: {shipment.inboundOperator} • {shipment.inboundDate}
+          <div className="text-xs text-[#412D15]/70">
+            {shipment.inboundOperator} • {shipment.inboundDate}
           </div>
         </div>
 
         {/* Weight Out */}
-        <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-4 flex flex-col justify-between">
-          <div className="flex items-center justify-between text-slate-400 text-xs font-medium uppercase tracking-wider">
-            <span>Outbound Weight (Dispatch)</span>
-            <Scale className="w-4 h-4 text-indigo-400" />
+        <div className="bg-[#faf6f2] border border-[#ebdcd0] rounded-xl p-5 flex flex-col justify-between">
+          <div className="flex items-center justify-between text-[#412D15]/70 text-xs font-bold uppercase tracking-wider">
+            <span>Outbound (Dispatch)</span>
+            <Scale className="w-5 h-5 text-[#6E3511]" />
           </div>
           <div className="my-3">
             {currentWeightOut > 0 ? (
               <>
-                <span className="text-3xl font-extrabold text-white tracking-tight">
+                <span className="text-3xl md:text-4xl font-black text-[#412D15] tracking-tight font-mono">
                   {currentWeightOut.toFixed(2)}
                 </span>
-                <span className="text-slate-400 ml-1.5 font-medium text-sm">kg</span>
+                <span className="text-[#412D15]/60 ml-2 text-sm font-bold">kg</span>
               </>
             ) : (
-              <span className="text-2xl font-semibold text-slate-600 italic">
-                Awaiting scale reading...
+              <span className="text-sm font-medium text-[#412D15]/50 italic">
+                Awaiting scale placement...
               </span>
             )}
           </div>
-          <div className="text-xs text-slate-500">
+          <div className="text-xs text-[#412D15]/70">
             {shipment.outboundDate ? `${shipment.outboundDate} • ${shipment.outboundOperator}` : 'Scale ready for verification'}
           </div>
         </div>
 
         {/* Pilferage Variance Calculator */}
-        <div className={`rounded-xl p-4 border flex flex-col justify-between transition-all ${
+        <div className={`rounded-xl p-5 border flex flex-col justify-between transition-all ${
           !currentWeightOut 
-            ? 'bg-slate-950/40 border-slate-800' 
+            ? 'bg-[#faf6f2] border-[#ebdcd0]' 
             : exceedsTolerance 
-              ? 'bg-red-950/40 border-red-500/50 shadow-lg shadow-red-950/40' 
-              : 'bg-emerald-950/30 border-emerald-500/40'
+              ? 'bg-rose-50 border-rose-300' 
+              : 'bg-emerald-50 border-emerald-300'
         }`}>
-          <div className="flex items-center justify-between text-xs font-medium uppercase tracking-wider">
-            <span className={exceedsTolerance ? 'text-red-400 font-bold' : 'text-slate-400'}>
+          <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider">
+            <span className={exceedsTolerance ? 'text-rose-800' : 'text-[#412D15]/70'}>
               Variance Analysis
             </span>
             {exceedsTolerance ? (
-              <AlertTriangle className="w-4 h-4 text-red-400 animate-bounce" />
+              <AlertTriangle className="w-5 h-5 text-rose-600" />
             ) : currentWeightOut > 0 ? (
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <CheckCircle2 className="w-5 h-5 text-emerald-600" />
             ) : (
-              <Info className="w-4 h-4 text-slate-500" />
+              <Info className="w-5 h-5 text-[#6E3511]/60" />
             )}
           </div>
 
           <div className="my-3">
             {currentWeightOut > 0 ? (
               <div>
-                <div className="flex items-baseline gap-2">
-                  <span className={`text-3xl font-black ${
-                    exceedsTolerance ? 'text-red-400' : 'text-emerald-400'
+                <div className="flex items-baseline gap-3">
+                  <span className={`text-3xl md:text-4xl font-black font-mono ${
+                    exceedsTolerance ? 'text-rose-700' : 'text-emerald-700'
                   }`}>
                     {diffKg > 0 ? `+${diffKg}` : diffKg} kg
                   </span>
-                  <span className={`text-sm font-semibold px-2 py-0.5 rounded ${
+                  <span className={`text-xs md:text-sm font-mono font-bold px-2.5 py-1 rounded-md ${
                     exceedsTolerance 
-                      ? 'bg-red-500/20 text-red-300' 
-                      : 'bg-emerald-500/20 text-emerald-300'
+                      ? 'bg-rose-100 text-rose-800 border border-rose-200' 
+                      : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
                   }`}>
                     {diffPercent > 0 ? `+${diffPercent}%` : `${diffPercent}%`}
                   </span>
                 </div>
-                <div className="text-xs mt-1 text-slate-400">
+                <div className="text-xs text-[#412D15]/75 mt-1 font-medium">
                   Allowed delta: ±{((shipment.weightInKg * shipment.tolerancePercentage) / 100).toFixed(2)} kg
                 </div>
               </div>
             ) : (
-              <div className="text-slate-500 text-sm py-2">
-                Real-time loss computation will display immediately upon weighing.
+              <div className="text-[#412D15]/60 text-xs md:text-sm py-2">
+                Real-time variance will calculate immediately upon weighing.
               </div>
             )}
           </div>
 
           <div className="text-xs">
             {exceedsTolerance ? (
-              <span className="text-red-400 font-semibold flex items-center gap-1">
-                <ShieldAlert className="w-3.5 h-3.5" /> High Risk Pilferage Flagged!
+              <span className="text-rose-700 font-bold flex items-center gap-1.5">
+                <ShieldAlert className="w-4 h-4" /> Discrepancy Exceeds Tolerance
               </span>
             ) : currentWeightOut > 0 ? (
-              <span className="text-emerald-400 font-medium flex items-center gap-1">
-                <CheckCircle2 className="w-3.5 h-3.5" /> Normal weight consistency
+              <span className="text-emerald-700 font-bold flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4" /> Weight match confirmed
               </span>
             ) : (
-              <span className="text-slate-500">Threshold: ±{shipment.tolerancePercentage}%</span>
+              <span className="text-[#412D15]/60 font-medium">Threshold: ±{shipment.tolerancePercentage}%</span>
             )}
           </div>
         </div>
       </div>
 
-      {/* Discrepancy warning banner if pilferage detected */}
+      {/* Discrepancy warning banner */}
       {exceedsTolerance && (
-        <div className="bg-red-950/60 border border-red-500/60 rounded-xl p-4 mb-4 text-red-200">
-          <div className="flex items-start gap-3">
-            <div className="p-2 bg-red-600/20 text-red-400 rounded-lg shrink-0 mt-0.5">
-              <ShieldAlert className="w-5 h-5" />
+        <div className="bg-rose-50 border border-rose-300 rounded-xl p-5 mb-5 text-[#412D15]">
+          <div className="flex items-start gap-3.5">
+            <div className="p-2 bg-rose-600 text-white rounded-lg shrink-0 mt-0.5">
+              <ShieldAlert className="w-5 h-5 stroke-[2]" />
             </div>
             <div>
-              <h4 className="font-bold text-red-100 flex items-center gap-2">
+              <h4 className="font-extrabold text-rose-900 text-sm md:text-base">
                 SECURITY ALERT: POTENTIAL PILFERAGE DETECTED
               </h4>
-              <p className="text-sm text-red-300 mt-1">
-                The parcel weighs <strong>{Math.abs(diffKg)} kg less</strong> than its logged inbound weight. 
-                This deficit represents a <strong>{absLossPercent}% reduction</strong>, which significantly violates 
-                the specified category limit of {shipment.tolerancePercentage}%. 
-                Do not allow driver departure until security unboxing & item count verification is performed.
+              <p className="text-xs md:text-sm text-rose-800 mt-1">
+                Parcel weighs <strong>{Math.abs(diffKg)} kg less</strong> than inbound arrival weight ({absLossPercent}% loss, permissible limit is {shipment.tolerancePercentage}%). Do not release for loading before physical unboxing audit.
               </p>
             </div>
           </div>
         </div>
       )}
 
-      {/* Action buttons if this is an interactive check */}
+      {/* Action buttons */}
       {(onClearDispatch || onFlagPilferage) && currentWeightOut > 0 && (
-        <div className="mt-4 pt-4 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex-1 min-w-[200px]">
+        <div className="mt-5 pt-5 border-t border-[#ebdcd0] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+          <div className="flex-1">
             <input 
               type="text"
-              placeholder="Add inspection or security remarks (optional)..."
+              placeholder="Inspection or security remarks..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full bg-slate-950 text-slate-200 text-sm border border-slate-800 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+              className="w-full bg-[#faf6f2] text-[#412D15] text-sm border border-[#ebdcd0] rounded-xl px-4 py-3 focus:outline-none focus:border-[#6E3511] focus:bg-white transition"
             />
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {exceedsTolerance ? (
               <button
                 onClick={() => onFlagPilferage?.(
                   currentWeightOut, 
                   notes, 
-                  `Critical deficit of ${Math.abs(diffKg)} kg (${absLossPercent}% loss) detected at outbound weigh-in station.`
+                  `Weight shortfall of ${Math.abs(diffKg)} kg (${absLossPercent}% loss) detected on outbound scale.`
                 )}
-                className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-semibold text-sm flex items-center gap-2 shadow-lg shadow-red-900/40 transition active:scale-95"
+                className="w-full sm:w-auto px-5 py-3 bg-rose-700 hover:bg-rose-800 text-white rounded-xl font-bold text-xs md:text-sm flex items-center justify-center gap-2 shadow-xs transition active:scale-95"
               >
                 <ShieldAlert className="w-4 h-4" />
-                Trigger Pilferage Alert & Hold
+                Hold for Security Audit
               </button>
             ) : (
               <button
                 onClick={() => onClearDispatch?.(currentWeightOut, notes)}
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg font-semibold text-sm flex items-center gap-2 shadow-lg shadow-emerald-900/40 transition active:scale-95"
+                className="w-full sm:w-auto px-5 py-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl font-bold text-xs md:text-sm flex items-center justify-center gap-2 shadow-xs transition active:scale-95"
               >
                 <CheckCircle2 className="w-4 h-4" />
-                Verify & Clear for Dispatch
+                Clear for Dispatch
               </button>
             )}
           </div>
