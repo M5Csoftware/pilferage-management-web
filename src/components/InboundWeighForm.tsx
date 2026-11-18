@@ -8,60 +8,65 @@ import {
   Barcode, 
   CheckCircle,
   Truck,
-  Building,
-  User,
-  Sliders,
-  Sparkles
+  Sparkles,
+  Plane
 } from 'lucide-react';
-import { Shipment } from '@/types/shipment';
+import { Shipment, AuthUser } from '@/types/shipment';
+import { SystemSettings } from '@/types/settings';
 
 interface InboundWeighFormProps {
   onShipmentRecorded: (shipment: Shipment) => void;
+  currentUser: AuthUser;
+  settings: SystemSettings;
 }
 
-export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({ onShipmentRecorded }) => {
-  const [trackingNumber, setTrackingNumber] = useState('');
+export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({ 
+  onShipmentRecorded, 
+  currentUser,
+  settings 
+}) => {
+  const [awbNumber, setAwbNumber] = useState('');
   const [senderName, setSenderName] = useState('');
   const [recipientName, setRecipientName] = useState('');
-  const [origin, setOrigin] = useState('Hub Central Alpha');
-  const [destination, setDestination] = useState('');
+  const [origin, setOrigin] = useState('Shenzhen Freight Port');
+  const [destination, setDestination] = useState('Delhi Cargo Terminal Hub');
   const [category, setCategory] = useState<Shipment['category']>('Electronics');
   const [itemsCount, setItemsCount] = useState<number>(1);
   const [weightInKg, setWeightInKg] = useState<string>('');
-  const [operator, setOperator] = useState('Operator John (Station 1)');
+  const [operator, setOperator] = useState(currentUser.name || 'Scale Operator 1');
   const [sealNumber, setSealNumber] = useState('');
-  const [tolerance, setTolerance] = useState<number>(1.0);
+  const [tolerance, setTolerance] = useState<number>(settings.defaultTolerancePercentage);
   const [notes, setNotes] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // Quick preset demo generator for fast testing
   const handleFillDemo = () => {
-    const randomId = Math.floor(1000 + Math.random() * 9000);
-    setTrackingNumber(`TRK-2026-${randomId}`);
-    setSenderName('Apex High-End Electronics Depot');
-    setRecipientName('Regional Logistics Center North');
-    setDestination('Customer Fulfillment Hub 3');
+    const randomAwb = Math.floor(10000000 + Math.random() * 90000000);
+    setAwbNumber(`AWB-${randomAwb}`);
+    setSenderName('Shenzhen Global Electronics Ltd');
+    setRecipientName('Nexus Warehousing Tech Hub');
+    setOrigin('Hong Kong International HKG-Air');
+    setDestination(settings.hubName);
     setCategory('Electronics');
-    setItemsCount(24);
-    setWeightInKg((48.75 + Math.random() * 5).toFixed(2));
-    setSealNumber(`SL-${Math.floor(100000 + Math.random() * 900000)}`);
-    setTolerance(1.0);
+    setItemsCount(48);
+    setWeightInKg((85.40 + Math.random() * 12).toFixed(2));
+    setSealNumber(`SEAL-${Math.floor(100000 + Math.random() * 900000)}`);
+    setTolerance(settings.defaultTolerancePercentage);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!trackingNumber || !weightInKg || parseFloat(weightInKg) <= 0) {
-      alert('Please fill out the tracking number and a valid weight in kg.');
+    if (!awbNumber || !weightInKg || parseFloat(weightInKg) <= 0) {
+      alert('Please fill out the Air Waybill (AWB) number and a valid weight in kg.');
       return;
     }
 
     const newShipment: Shipment = {
       id: `SHP-${Math.floor(10000 + Math.random() * 90000)}`,
-      trackingNumber,
-      senderName: senderName || 'Declared Vendor',
-      recipientName: recipientName || 'Target Receiver',
+      awbNumber: awbNumber.trim().toUpperCase(),
+      senderName: senderName || 'Declared Freight Forwarder',
+      recipientName: recipientName || 'Target Receiver Facility',
       origin: origin || 'Local Gateway',
-      destination: destination || 'Domestic Delivery',
+      destination: destination || settings.hubName,
       category,
       itemsCount: itemsCount || 1,
       tolerancePercentage: tolerance,
@@ -77,8 +82,7 @@ export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({ onShipmentRe
     setIsSuccess(true);
     setTimeout(() => {
       setIsSuccess(false);
-      // Reset form
-      setTrackingNumber('');
+      setAwbNumber('');
       setWeightInKg('');
       setSealNumber('');
       setNotes('');
@@ -86,58 +90,56 @@ export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({ onShipmentRe
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-800">
+    <div className="bg-white border border-[#ebdcd0] rounded-2xl p-6 md:p-10 shadow-xs max-w-4xl mx-auto text-[#412D15]">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-[#ebdcd0]">
         <div>
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <PackagePlus className="w-5 h-5 text-blue-400" />
+          <h2 className="text-xl md:text-2xl font-black text-[#412D15] flex items-center gap-3">
+            <PackagePlus className="w-6 h-6 text-[#6E3511] stroke-[2]" />
             Inbound Intake & Weight Recording (Step 1)
           </h2>
-          <p className="text-sm text-slate-400 mt-1">
-            Capture authentic parcel arrival weight and security seal data to establish the baseline baseline against pilferage.
+          <p className="text-sm md:text-base text-[#412D15]/70 font-normal mt-1">
+            Record arrival AWB scale reading and security seal to lock baseline weight.
           </p>
         </div>
 
         <button
           type="button"
           onClick={handleFillDemo}
-          className="text-xs bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 border border-blue-500/30 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition"
+          className="text-xs md:text-sm bg-[#faf6f2] hover:bg-[#f6eee7] text-[#412D15] border border-[#ebdcd0] px-4 py-2 rounded-xl flex items-center gap-2 transition self-start sm:self-auto font-bold shadow-2xs"
         >
-          <Sparkles className="w-3.5 h-3.5" /> Auto-Fill Sample Data
+          <Sparkles className="w-4 h-4 text-[#6E3511]" /> Auto-Fill Sample AWB
         </button>
       </div>
 
       {isSuccess && (
-        <div className="mb-6 p-4 bg-emerald-950/80 border border-emerald-500 rounded-xl flex items-center gap-3 text-emerald-200 animate-fadeIn">
-          <CheckCircle className="w-6 h-6 text-emerald-400 shrink-0" />
-          <div>
-            <div className="font-bold">Inbound Baseline Logged Successfully!</div>
-            <div className="text-xs text-emerald-300">Shipment weight is secured in the ledger for dispatch cross-examination.</div>
-          </div>
+        <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-3 text-emerald-800 text-sm md:text-base animate-fadeIn">
+          <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
+          <span className="font-medium">Inbound weight logged successfully. Baseline is secured in audit ledger.</span>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wide">
-              Tracking / Consignment ID *
+            <label className="block text-xs md:text-sm font-bold text-[#412D15] mb-2 uppercase tracking-wide flex items-center gap-1.5">
+              <Plane className="w-4 h-4 text-[#6E3511]" />
+              Air Waybill (AWB) # *
             </label>
             <div className="relative">
               <input
                 type="text"
                 required
-                placeholder="e.g. TRK-2026-9041"
-                value={trackingNumber}
-                onChange={(e) => setTrackingNumber(e.target.value)}
-                className="w-full bg-slate-950 text-white border border-slate-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-xl pl-10 pr-4 py-2.5 text-sm"
+                placeholder="e.g. AWB-2026-9041"
+                value={awbNumber}
+                onChange={(e) => setAwbNumber(e.target.value)}
+                className="w-full bg-[#faf6f2] text-[#412D15] font-mono font-bold border border-[#ebdcd0] focus:border-[#6E3511] focus:bg-white rounded-xl pl-11 pr-4 py-3 text-sm md:text-base focus:outline-none transition"
               />
-              <Barcode className="w-4 h-4 text-slate-500 absolute left-3.5 top-3" />
+              <Barcode className="w-5 h-5 text-[#6E3511]/60 absolute left-3.5 top-3.5" />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wide">
+            <label className="block text-xs md:text-sm font-bold text-[#412D15] mb-2 uppercase tracking-wide">
               Security Seal Barcode #
             </label>
             <div className="relative">
@@ -146,28 +148,28 @@ export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({ onShipmentRe
                 placeholder="e.g. SEAL-88491"
                 value={sealNumber}
                 onChange={(e) => setSealNumber(e.target.value)}
-                className="w-full bg-slate-950 text-white border border-slate-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 rounded-xl pl-10 pr-4 py-2.5 text-sm"
+                className="w-full bg-[#faf6f2] text-[#412D15] font-mono border border-[#ebdcd0] focus:border-[#6E3511] focus:bg-white rounded-xl pl-11 pr-4 py-3 text-sm md:text-base focus:outline-none transition"
               />
-              <ShieldCheck className="w-4 h-4 text-emerald-500 absolute left-3.5 top-3" />
+              <ShieldCheck className="w-5 h-5 text-[#6E3511]/60 absolute left-3.5 top-3.5" />
             </div>
           </div>
         </div>
 
-        {/* Dynamic Scale Weight Input Focus Area */}
-        <div className="bg-gradient-to-r from-blue-950/40 via-indigo-950/30 to-slate-900 border border-blue-500/30 rounded-2xl p-5 shadow-inner">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        {/* Digital Scale Deck */}
+        <div className="bg-[#faf6f2] border border-[#ebdcd0] rounded-2xl p-6 md:p-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
             <div>
-              <label className="block text-sm font-bold text-blue-200 flex items-center gap-1.5">
-                <Scale className="w-4 h-4 text-blue-400" />
+              <label className="block text-sm md:text-base font-extrabold text-[#412D15] flex items-center gap-2 uppercase tracking-wider">
+                <Scale className="w-5 h-5 text-[#6E3511]" />
                 Arrival Scale Reading (Weight In) *
               </label>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Digital scale interface: ensure scale is tared at 0.00 kg before placing parcel.
+              <p className="text-xs md:text-sm text-[#412D15]/70 font-normal mt-1">
+                Ensure scale tare reads exactly 0.00 kg before placing consignment.
               </p>
             </div>
 
-            <div className="flex items-center gap-2">
-              <div className="relative">
+            <div className="flex items-center gap-3">
+              <div className="relative w-full sm:w-auto">
                 <input
                   type="number"
                   step="0.01"
@@ -176,9 +178,9 @@ export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({ onShipmentRe
                   placeholder="0.00"
                   value={weightInKg}
                   onChange={(e) => setWeightInKg(e.target.value)}
-                  className="bg-slate-950 text-2xl font-black text-blue-400 border-2 border-blue-500/50 rounded-xl px-4 py-2 w-36 text-right focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 shadow-inner"
+                  className="bg-white text-3xl md:text-4xl font-mono font-black text-[#412D15] border-2 border-[#ebdcd0] focus:border-[#6E3511] rounded-xl px-4 py-2.5 w-full sm:w-48 text-right focus:outline-none shadow-xs"
                 />
-                <span className="absolute right-3.5 top-3.5 text-xs text-slate-400 font-bold pointer-events-none">
+                <span className="absolute right-4 top-4 text-xs font-bold text-[#412D15]/50 pointer-events-none">
                   KG
                 </span>
               </div>
@@ -187,9 +189,9 @@ export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({ onShipmentRe
         </div>
 
         {/* Logistics Context */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wide">
+            <label className="block text-xs md:text-sm font-bold text-[#412D15] mb-2 uppercase tracking-wide">
               Consignor (Sender)
             </label>
             <input
@@ -197,60 +199,90 @@ export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({ onShipmentRe
               placeholder="e.g. Apex Tech Suppliers"
               value={senderName}
               onChange={(e) => setSenderName(e.target.value)}
-              className="w-full bg-slate-950 text-white border border-slate-800 rounded-xl px-3.5 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              className="w-full bg-[#faf6f2] text-[#412D15] border border-[#ebdcd0] rounded-xl px-4 py-3 text-sm focus:border-[#6E3511] focus:bg-white focus:outline-none transition"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wide">
-              Consignee (Destination Recipient)
+            <label className="block text-xs md:text-sm font-bold text-[#412D15] mb-2 uppercase tracking-wide">
+              Consignee (Recipient)
             </label>
             <input
               type="text"
               placeholder="e.g. Retail Store #104"
               value={recipientName}
               onChange={(e) => setRecipientName(e.target.value)}
-              className="w-full bg-slate-950 text-white border border-slate-800 rounded-xl px-3.5 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              className="w-full bg-[#faf6f2] text-[#412D15] border border-[#ebdcd0] rounded-xl px-4 py-3 text-sm focus:border-[#6E3511] focus:bg-white focus:outline-none transition"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wide">
-              Product Category
+            <label className="block text-xs md:text-sm font-bold text-[#412D15] mb-2 uppercase tracking-wide">
+              Category
             </label>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value as Shipment['category'])}
-              className="w-full bg-slate-950 text-white border border-slate-800 rounded-xl px-3.5 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              className="w-full bg-[#faf6f2] text-[#412D15] font-semibold border border-[#ebdcd0] rounded-xl px-4 py-3 text-sm focus:border-[#6E3511] focus:bg-white focus:outline-none transition"
             >
-              <option value="Electronics">Electronics (Laptops/Phones/Chips)</option>
-              <option value="High-Value">High-Value (Jewelry/Luxury/Perfumes)</option>
+              <option value="Electronics">Electronics</option>
+              <option value="High-Value">High-Value Cargo</option>
+              <option value="Pharma">Pharma / Cold Chain</option>
               <option value="Apparel">Apparel & Textiles</option>
-              <option value="Perishables">Perishables / Cold Chain</option>
-              <option value="General Freight">General Freight / Heavy Cargo</option>
+              <option value="Perishables">Perishables</option>
+              <option value="General Freight">General Freight</option>
             </select>
           </div>
         </div>
 
-        {/* Tolerance & Configuration */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+        {/* Route Details */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wide">
-              Items Count inside Box
+            <label className="block text-xs md:text-sm font-bold text-[#412D15] mb-2 uppercase tracking-wide">
+              Origin Port / Facility
+            </label>
+            <input
+              type="text"
+              placeholder="e.g. Shenzhen Airport Cargo"
+              value={origin}
+              onChange={(e) => setOrigin(e.target.value)}
+              className="w-full bg-[#faf6f2] text-[#412D15] border border-[#ebdcd0] rounded-xl px-4 py-3 text-sm focus:border-[#6E3511] focus:bg-white focus:outline-none transition"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs md:text-sm font-bold text-[#412D15] mb-2 uppercase tracking-wide">
+              Destination Terminal / Hub
+            </label>
+            <input
+              type="text"
+              placeholder="e.g. Delhi Air Freight Hub Gate 4"
+              value={destination}
+              onChange={(e) => setDestination(e.target.value)}
+              className="w-full bg-[#faf6f2] text-[#412D15] border border-[#ebdcd0] rounded-xl px-4 py-3 text-sm focus:border-[#6E3511] focus:bg-white focus:outline-none transition"
+            />
+          </div>
+        </div>
+
+        {/* Tolerance & Pieces */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 pt-2">
+          <div>
+            <label className="block text-xs md:text-sm font-bold text-[#412D15] mb-2 uppercase tracking-wide">
+              Package Count (Pieces)
             </label>
             <input
               type="number"
               min="1"
               value={itemsCount}
               onChange={(e) => setItemsCount(parseInt(e.target.value) || 1)}
-              className="w-full bg-slate-950 text-white border border-slate-800 rounded-xl px-3.5 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              className="w-full bg-[#faf6f2] text-[#412D15] font-mono font-bold border border-[#ebdcd0] rounded-xl px-4 py-3 text-sm focus:border-[#6E3511] focus:bg-white focus:outline-none transition"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wide flex items-center justify-between">
-              <span>Pilferage Margin (% Loss)</span>
-              <span className="text-amber-400 font-bold">{tolerance}%</span>
+            <label className="block text-xs md:text-sm font-bold text-[#412D15] mb-2 uppercase tracking-wide flex items-center justify-between">
+              <span>Tolerance (% Allowed)</span>
+              <span className="text-[#6E3511] font-mono font-bold text-sm">±{tolerance}%</span>
             </label>
             <input
               type="range"
@@ -259,46 +291,43 @@ export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({ onShipmentRe
               step="0.1"
               value={tolerance}
               onChange={(e) => setTolerance(parseFloat(e.target.value))}
-              className="w-full accent-blue-500 cursor-pointer mt-2"
+              className="w-full accent-[#6E3511] cursor-pointer mt-2"
             />
-            <span className="text-[11px] text-slate-500 block">
-              Flag if weight loss on dispatch exceeds {tolerance}%
-            </span>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wide">
-              Inbound Station Attendant
+            <label className="block text-xs md:text-sm font-bold text-[#412D15] mb-2 uppercase tracking-wide">
+              Attendant / Operator
             </label>
             <input
               type="text"
               value={operator}
               onChange={(e) => setOperator(e.target.value)}
-              className="w-full bg-slate-950 text-white border border-slate-800 rounded-xl px-3.5 py-2 text-sm focus:border-blue-500 focus:outline-none"
+              className="w-full bg-[#faf6f2] text-[#412D15] font-semibold border border-[#ebdcd0] rounded-xl px-4 py-3 text-sm focus:border-[#6E3511] focus:bg-white focus:outline-none transition"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wide">
-            Initial Package Condition Remarks
+          <label className="block text-xs md:text-sm font-bold text-[#412D15] mb-2 uppercase tracking-wide">
+            Initial Remarks & Package Condition
           </label>
           <input
             type="text"
-            placeholder="e.g. Factory sealed, holographic tape intact, no tears on edges"
+            placeholder="e.g. Factory sealed, outer box intact, no tape tears"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            className="w-full bg-slate-950 text-slate-300 border border-slate-800 rounded-xl px-3.5 py-2 text-sm focus:border-blue-500 focus:outline-none"
+            className="w-full bg-[#faf6f2] text-[#412D15] border border-[#ebdcd0] rounded-xl px-4 py-3 text-sm focus:border-[#6E3511] focus:bg-white focus:outline-none transition"
           />
         </div>
 
-        <div className="pt-2">
+        <div className="pt-4">
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-blue-600/30 transition transform active:scale-[0.99]"
+            className="w-full bg-[#6E3511] hover:bg-[#582a0d] text-white font-bold py-4 px-6 rounded-xl flex items-center justify-center gap-3 transition shadow-xs text-sm md:text-base active:scale-[0.99]"
           >
             <Scale className="w-5 h-5" />
-            Lock Inbound Weight & Register Shipment
+            Lock Inbound Weight & Register AWB
           </button>
         </div>
       </form>
