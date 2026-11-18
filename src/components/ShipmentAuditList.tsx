@@ -46,78 +46,77 @@ export const ShipmentAuditList: React.FC<ShipmentAuditListProps> = ({
   });
 
   return (
-    <div className="bg-white border border-[#ebdcd0] rounded-2xl p-6 md:p-8 shadow-xs text-[#412D15]">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 pb-5 border-b border-[#ebdcd0]">
+    <div className="bg-white border border-[#ebdcd0] rounded-2xl p-4 sm:p-6 md:p-8 shadow-xs text-[#412D15]">
+      {/* Header & Filter Controls */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4 sm:mb-6 pb-4 sm:pb-5 border-b border-[#ebdcd0]">
         <div>
-          <h2 className="text-xl md:text-2xl font-black text-[#412D15] flex items-center gap-3">
-            <Scale className="w-6 h-6 text-[#6E3511] stroke-[2]" />
-            Consolidated Weight & Pilferage Audit Log
+          <h2 className="text-lg sm:text-xl md:text-2xl font-black text-[#412D15] flex items-center gap-2.5">
+            <Scale className="w-5 h-5 sm:w-6 sm:h-6 text-[#6E3511] stroke-[2] shrink-0" />
+            <span>Consolidated Weight Audit Log</span>
           </h2>
-          <p className="text-sm md:text-base text-[#412D15]/70 font-normal mt-1">
+          <p className="text-xs sm:text-sm text-[#412D15]/70 font-normal mt-0.5">
             Complete chain-of-custody ledger comparing arrival baseline vs departure weight.
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          {/* Status Filters */}
-          <div className="flex items-center bg-[#faf6f2] p-1.5 rounded-xl border border-[#ebdcd0] text-xs md:text-sm overflow-x-auto w-full sm:w-auto">
-            <button
-              onClick={() => setFilterStatus('ALL')}
-              className={`px-3.5 py-1.5 rounded-lg font-bold whitespace-nowrap transition ${
-                filterStatus === 'ALL' ? 'bg-[#6E3511] text-white shadow-xs' : 'text-[#412D15]/80 hover:text-[#412D15]'
-              }`}
-            >
-              All ({shipments.length})
-            </button>
-            <button
-              onClick={() => setFilterStatus('FLAGGED')}
-              className={`px-3.5 py-1.5 rounded-lg font-bold whitespace-nowrap transition flex items-center gap-1.5 ${
-                filterStatus === 'FLAGGED' 
-                  ? 'bg-rose-100 text-rose-800 border border-rose-200' 
-                  : 'text-[#412D15]/80 hover:text-rose-700'
-              }`}
-            >
-              <AlertTriangle className="w-4 h-4 text-rose-600" />
-              Pilfered ({shipments.filter(s => s.status === 'PILFERAGE_FLAGGED').length})
-            </button>
-            <button
-              onClick={() => setFilterStatus('CLEARED')}
-              className={`px-3.5 py-1.5 rounded-lg font-bold whitespace-nowrap transition ${
-                filterStatus === 'CLEARED' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'text-[#412D15]/80 hover:text-emerald-700'
-              }`}
-            >
-              Cleared ({shipments.filter(s => s.status === 'DISPATCHED_CLEARED').length})
-            </button>
-            <button
-              onClick={() => setFilterStatus('INBOUND')}
-              className={`px-3.5 py-1.5 rounded-lg font-bold whitespace-nowrap transition ${
-                filterStatus === 'INBOUND' ? 'bg-[#ebdcd0] text-[#412D15]' : 'text-[#412D15]/80 hover:text-[#412D15]'
-              }`}
-            >
-              Pending Out ({shipments.filter(s => s.status === 'INBOUND_RECORDED').length})
-            </button>
-          </div>
+        {/* Status Filter Tabs (Horizontally swipeable on mobile) */}
+        <div className="flex items-center bg-[#faf6f2] p-1 rounded-xl border border-[#ebdcd0] text-xs overflow-x-auto no-scrollbar w-full md:w-auto shrink-0 gap-1">
+          <button
+            onClick={() => setFilterStatus('ALL')}
+            className={`px-3 py-1.5 rounded-lg font-bold whitespace-nowrap transition min-h-[34px] ${
+              filterStatus === 'ALL' ? 'bg-[#6E3511] text-white shadow-xs' : 'text-[#412D15]/80 hover:text-[#412D15]'
+            }`}
+          >
+            All ({shipments.length})
+          </button>
+          <button
+            onClick={() => setFilterStatus('FLAGGED')}
+            className={`px-3 py-1.5 rounded-lg font-bold whitespace-nowrap transition flex items-center gap-1.5 min-h-[34px] ${
+              filterStatus === 'FLAGGED' 
+                ? 'bg-rose-100 text-rose-800 border border-rose-200' 
+                : 'text-[#412D15]/80 hover:text-rose-700'
+            }`}
+          >
+            <AlertTriangle className="w-3.5 h-3.5 text-rose-600 shrink-0" />
+            Pilfered ({shipments.filter(s => s.status === 'PILFERAGE_FLAGGED').length})
+          </button>
+          <button
+            onClick={() => setFilterStatus('CLEARED')}
+            className={`px-3 py-1.5 rounded-lg font-bold whitespace-nowrap transition min-h-[34px] ${
+              filterStatus === 'CLEARED' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'text-[#412D15]/80 hover:text-emerald-700'
+            }`}
+          >
+            Cleared ({shipments.filter(s => s.status === 'DISPATCHED_CLEARED').length})
+          </button>
+          <button
+            onClick={() => setFilterStatus('INBOUND')}
+            className={`px-3 py-1.5 rounded-lg font-bold whitespace-nowrap transition min-h-[34px] ${
+              filterStatus === 'INBOUND' ? 'bg-[#ebdcd0] text-[#412D15]' : 'text-[#412D15]/80 hover:text-[#412D15]'
+            }`}
+          >
+            Pending ({shipments.filter(s => s.status === 'INBOUND_RECORDED').length})
+          </button>
         </div>
       </div>
 
       {/* Search Bar */}
-      <div className="mb-6">
+      <div className="mb-4 sm:mb-6">
         <div className="relative">
           <input
             type="text"
-            placeholder="Search across AWB #, tracking numbers, consignors, cities..."
+            placeholder="Search AWB #, tracking ID, sender, recipient..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-[#faf6f2] text-[#412D15] border border-[#ebdcd0] rounded-xl pl-11 pr-4 py-3 text-sm md:text-base focus:border-[#6E3511] focus:bg-white focus:outline-none transition"
+            className="w-full bg-[#faf6f2] text-[#412D15] border border-[#ebdcd0] rounded-xl pl-10 pr-4 py-2.5 sm:py-3 text-xs sm:text-sm md:text-base focus:border-[#6E3511] focus:bg-white focus:outline-none transition min-h-[44px]"
           />
-          <Search className="w-5 h-5 text-[#6E3511]/60 absolute left-3.5 top-3.5" />
+          <Search className="w-4 h-4 sm:w-5 sm:h-5 text-[#6E3511]/60 absolute left-3.5 top-3 sm:top-3.5" />
         </div>
       </div>
 
-      {/* Mobile Card List */}
-      <div className="block lg:hidden space-y-4">
+      {/* Mobile Card List (Ultra Responsive for Phones) */}
+      <div className="block lg:hidden space-y-3">
         {filtered.length === 0 ? (
-          <div className="p-8 text-center text-[#412D15]/60 text-sm border border-[#ebdcd0] rounded-xl bg-[#faf6f2]">
+          <div className="p-8 text-center text-[#412D15]/60 text-xs sm:text-sm border border-[#ebdcd0] rounded-xl bg-[#faf6f2]">
             No shipments found matching criteria.
           </div>
         ) : (
@@ -130,61 +129,66 @@ export const ShipmentAuditList: React.FC<ShipmentAuditListProps> = ({
               <div 
                 key={item.id}
                 onClick={() => onSelectShipment?.(item)}
-                className={`p-5 rounded-xl border text-sm space-y-3 cursor-pointer transition shadow-2xs ${
+                className={`p-4 rounded-xl border text-xs sm:text-sm space-y-2.5 cursor-pointer transition shadow-2xs active:bg-[#f6eee7] ${
                   isFlagged 
                     ? 'bg-rose-50/70 border-rose-300' 
                     : 'bg-white border-[#ebdcd0] hover:border-[#dfcebf]'
                 }`}
               >
-                <div className="flex items-center justify-between">
-                  <span className="font-mono font-bold text-[#412D15] text-sm">
-                    {item.awbNumber}
-                  </span>
-                  <div>
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 truncate">
+                    <span className="font-mono font-bold text-[#412D15] text-xs sm:text-sm truncate">
+                      {item.awbNumber}
+                    </span>
+                    <span className="text-[10px] text-[#412D15]/50 font-mono">
+                      {item.id}
+                    </span>
+                  </div>
+                  <div className="shrink-0">
                     {isFlagged && (
-                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-200">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-200">
                         FLAGGED
                       </span>
                     )}
                     {isCleared && (
-                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
                         CLEARED
                       </span>
                     )}
                     {isPending && (
-                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#faf6f2] text-[#412D15] border border-[#ebdcd0]">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#faf6f2] text-[#412D15] border border-[#ebdcd0]">
                         PENDING
                       </span>
                     )}
                   </div>
                 </div>
 
-                <div className="text-[#412D15] font-semibold truncate">
+                <div className="text-[#412D15] font-semibold truncate text-xs sm:text-sm">
                   {item.senderName} → {item.recipientName}
                 </div>
 
-                <div className="grid grid-cols-3 gap-3 bg-[#faf6f2] p-3 rounded-lg border border-[#ebdcd0] font-mono text-center">
+                <div className="grid grid-cols-3 gap-2 bg-[#faf6f2] p-2.5 rounded-lg border border-[#ebdcd0] font-mono text-center">
                   <div>
-                    <span className="text-[#412D15]/60 block text-[10px] uppercase font-sans font-bold">Inbound</span>
-                    <span className="text-[#412D15] font-bold">{item.weightInKg.toFixed(2)} kg</span>
+                    <span className="text-[#412D15]/60 block text-[9px] uppercase font-sans font-bold">Inbound</span>
+                    <span className="text-[#412D15] font-bold text-xs">{item.weightInKg.toFixed(2)} kg</span>
                   </div>
                   <div>
-                    <span className="text-[#412D15]/60 block text-[10px] uppercase font-sans font-bold">Outbound</span>
-                    <span className="text-[#412D15] font-bold">
+                    <span className="text-[#412D15]/60 block text-[9px] uppercase font-sans font-bold">Outbound</span>
+                    <span className="text-[#412D15] font-bold text-xs">
                       {item.weightOutKg !== undefined ? `${item.weightOutKg.toFixed(2)} kg` : '—'}
                     </span>
                   </div>
                   <div>
-                    <span className="text-[#412D15]/60 block text-[10px] uppercase font-sans font-bold">Variance</span>
-                    <span className={`font-black ${isFlagged ? 'text-rose-600' : 'text-emerald-700'}`}>
+                    <span className="text-[#412D15]/60 block text-[9px] uppercase font-sans font-bold">Variance</span>
+                    <span className={`font-black text-xs ${isFlagged ? 'text-rose-600' : 'text-emerald-700'}`}>
                       {item.weightDiffKg !== undefined ? `${item.weightDiffKg > 0 ? `+${item.weightDiffKg}` : item.weightDiffKg} kg` : '—'}
                     </span>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between text-xs text-[#412D15]/60 pt-1">
-                  <span>{item.category} • Tol: ±{item.tolerancePercentage}%</span>
-                  <span className="text-[#6E3511] font-bold">Inspect Details →</span>
+                <div className="flex items-center justify-between text-[11px] text-[#412D15]/60 pt-0.5">
+                  <span className="truncate">{item.category} • Tol: ±{item.tolerancePercentage}%</span>
+                  <span className="text-[#6E3511] font-bold shrink-0 ml-2">Inspect Details →</span>
                 </div>
               </div>
             );
@@ -286,7 +290,7 @@ export const ShipmentAuditList: React.FC<ShipmentAuditListProps> = ({
                       {onSelectShipment && (
                         <button
                           onClick={() => onSelectShipment(item)}
-                          className="text-xs text-[#412D15] hover:text-white bg-[#faf6f2] hover:bg-[#6E3511] px-3.5 py-1.5 rounded-lg border border-[#ebdcd0] inline-flex items-center gap-1.5 transition font-bold"
+                          className="text-xs text-[#412D15] hover:text-white bg-[#faf6f2] hover:bg-[#6E3511] px-3.5 py-1.5 rounded-lg border border-[#ebdcd0] inline-flex items-center gap-1.5 transition font-bold min-h-[34px]"
                         >
                           <Eye className="w-3.5 h-3.5" /> View
                         </button>

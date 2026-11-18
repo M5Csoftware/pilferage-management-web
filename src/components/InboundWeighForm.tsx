@@ -90,14 +90,15 @@ export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({
   };
 
   return (
-    <div className="bg-white border border-[#ebdcd0] rounded-2xl p-6 md:p-10 shadow-xs max-w-4xl mx-auto text-[#412D15]">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-[#ebdcd0]">
+    <div className="bg-white border border-[#ebdcd0] rounded-2xl p-4 sm:p-7 md:p-10 shadow-xs max-w-4xl mx-auto text-[#412D15]">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 sm:mb-8 pb-5 sm:pb-6 border-b border-[#ebdcd0]">
         <div>
-          <h2 className="text-xl md:text-2xl font-black text-[#412D15] flex items-center gap-3">
-            <PackagePlus className="w-6 h-6 text-[#6E3511] stroke-[2]" />
-            Inbound Intake & Weight Recording (Step 1)
+          <h2 className="text-lg sm:text-xl md:text-2xl font-black text-[#412D15] flex items-center gap-2.5">
+            <PackagePlus className="w-5 h-5 sm:w-6 sm:h-6 text-[#6E3511] stroke-[2] shrink-0" />
+            <span>Inbound Intake & Weight Recording</span>
           </h2>
-          <p className="text-sm md:text-base text-[#412D15]/70 font-normal mt-1">
+          <p className="text-xs sm:text-sm text-[#412D15]/70 font-normal mt-1">
             Record arrival AWB scale reading and security seal to lock baseline weight.
           </p>
         </div>
@@ -105,24 +106,24 @@ export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({
         <button
           type="button"
           onClick={handleFillDemo}
-          className="text-xs md:text-sm bg-[#faf6f2] hover:bg-[#f6eee7] text-[#412D15] border border-[#ebdcd0] px-4 py-2 rounded-xl flex items-center gap-2 transition self-start sm:self-auto font-bold shadow-2xs"
+          className="w-full sm:w-auto text-xs sm:text-sm bg-[#faf6f2] hover:bg-[#f6eee7] active:bg-[#ebdcd0] text-[#412D15] border border-[#ebdcd0] px-3.5 py-2.5 rounded-xl flex items-center justify-center gap-2 transition font-bold shadow-2xs min-h-[42px]"
         >
-          <Sparkles className="w-4 h-4 text-[#6E3511]" /> Auto-Fill Sample AWB
+          <Sparkles className="w-4 h-4 text-[#6E3511] shrink-0" /> Auto-Fill Sample AWB
         </button>
       </div>
 
       {isSuccess && (
-        <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-3 text-emerald-800 text-sm md:text-base animate-fadeIn">
-          <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0" />
+        <div className="mb-5 p-3.5 sm:p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-2.5 text-emerald-800 text-xs sm:text-sm animate-fadeIn">
+          <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 shrink-0" />
           <span className="font-medium">Inbound weight logged successfully. Baseline is secured in audit ledger.</span>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
           <div>
-            <label className="block text-xs md:text-sm font-bold text-[#412D15] mb-2 uppercase tracking-wide flex items-center gap-1.5">
-              <Plane className="w-4 h-4 text-[#6E3511]" />
+            <label className="block text-xs font-bold text-[#412D15] mb-1.5 uppercase tracking-wide flex items-center gap-1.5">
+              <Plane className="w-3.5 h-3.5 text-[#6E3511]" />
               Air Waybill (AWB) # *
             </label>
             <div className="relative">
@@ -132,14 +133,14 @@ export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({
                 placeholder="e.g. AWB-2026-9041"
                 value={awbNumber}
                 onChange={(e) => setAwbNumber(e.target.value)}
-                className="w-full bg-[#faf6f2] text-[#412D15] font-mono font-bold border border-[#ebdcd0] focus:border-[#6E3511] focus:bg-white rounded-xl pl-11 pr-4 py-3 text-sm md:text-base focus:outline-none transition"
+                className="w-full bg-[#faf6f2] text-[#412D15] font-mono font-bold border border-[#ebdcd0] focus:border-[#6E3511] focus:bg-white rounded-xl pl-10 pr-3.5 py-2.5 sm:py-3 text-sm focus:outline-none transition min-h-[44px]"
               />
-              <Barcode className="w-5 h-5 text-[#6E3511]/60 absolute left-3.5 top-3.5" />
+              <Barcode className="w-5 h-5 text-[#6E3511]/60 absolute left-3 top-3" />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs md:text-sm font-bold text-[#412D15] mb-2 uppercase tracking-wide">
+            <label className="block text-xs font-bold text-[#412D15] mb-1.5 uppercase tracking-wide">
               Security Seal Barcode #
             </label>
             <div className="relative">
@@ -148,27 +149,27 @@ export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({
                 placeholder="e.g. SEAL-88491"
                 value={sealNumber}
                 onChange={(e) => setSealNumber(e.target.value)}
-                className="w-full bg-[#faf6f2] text-[#412D15] font-mono border border-[#ebdcd0] focus:border-[#6E3511] focus:bg-white rounded-xl pl-11 pr-4 py-3 text-sm md:text-base focus:outline-none transition"
+                className="w-full bg-[#faf6f2] text-[#412D15] font-mono border border-[#ebdcd0] focus:border-[#6E3511] focus:bg-white rounded-xl pl-10 pr-3.5 py-2.5 sm:py-3 text-sm focus:outline-none transition min-h-[44px]"
               />
-              <ShieldCheck className="w-5 h-5 text-[#6E3511]/60 absolute left-3.5 top-3.5" />
+              <ShieldCheck className="w-5 h-5 text-[#6E3511]/60 absolute left-3 top-3" />
             </div>
           </div>
         </div>
 
-        {/* Digital Scale Deck */}
-        <div className="bg-[#faf6f2] border border-[#ebdcd0] rounded-2xl p-6 md:p-8">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+        {/* Digital Scale Deck (Large & Prominent on Mobile) */}
+        <div className="bg-[#faf6f2] border border-[#ebdcd0] rounded-2xl p-4 sm:p-6 md:p-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <label className="block text-sm md:text-base font-extrabold text-[#412D15] flex items-center gap-2 uppercase tracking-wider">
-                <Scale className="w-5 h-5 text-[#6E3511]" />
+              <label className="block text-xs sm:text-sm md:text-base font-extrabold text-[#412D15] flex items-center gap-2 uppercase tracking-wider">
+                <Scale className="w-4 h-4 sm:w-5 sm:h-5 text-[#6E3511]" />
                 Arrival Scale Reading (Weight In) *
               </label>
-              <p className="text-xs md:text-sm text-[#412D15]/70 font-normal mt-1">
+              <p className="text-[11px] sm:text-xs text-[#412D15]/70 font-normal mt-0.5">
                 Ensure scale tare reads exactly 0.00 kg before placing consignment.
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 w-full sm:w-auto">
               <div className="relative w-full sm:w-auto">
                 <input
                   type="number"
@@ -178,9 +179,9 @@ export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({
                   placeholder="0.00"
                   value={weightInKg}
                   onChange={(e) => setWeightInKg(e.target.value)}
-                  className="bg-white text-3xl md:text-4xl font-mono font-black text-[#412D15] border-2 border-[#ebdcd0] focus:border-[#6E3511] rounded-xl px-4 py-2.5 w-full sm:w-48 text-right focus:outline-none shadow-xs"
+                  className="bg-white text-3xl sm:text-4xl font-mono font-black text-[#412D15] border-2 border-[#ebdcd0] focus:border-[#6E3511] rounded-xl px-4 py-2.5 sm:py-3 w-full sm:w-48 text-right focus:outline-none shadow-xs"
                 />
-                <span className="absolute right-4 top-4 text-xs font-bold text-[#412D15]/50 pointer-events-none">
+                <span className="absolute right-4 top-3.5 text-xs font-bold text-[#412D15]/50 pointer-events-none">
                   KG
                 </span>
               </div>
@@ -189,9 +190,9 @@ export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({
         </div>
 
         {/* Logistics Context */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-5">
           <div>
-            <label className="block text-xs md:text-sm font-bold text-[#412D15] mb-2 uppercase tracking-wide">
+            <label className="block text-xs font-bold text-[#412D15] mb-1.5 uppercase tracking-wide">
               Consignor (Sender)
             </label>
             <input
@@ -199,12 +200,12 @@ export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({
               placeholder="e.g. Apex Tech Suppliers"
               value={senderName}
               onChange={(e) => setSenderName(e.target.value)}
-              className="w-full bg-[#faf6f2] text-[#412D15] border border-[#ebdcd0] rounded-xl px-4 py-3 text-sm focus:border-[#6E3511] focus:bg-white focus:outline-none transition"
+              className="w-full bg-[#faf6f2] text-[#412D15] border border-[#ebdcd0] rounded-xl px-3.5 py-2.5 text-sm focus:border-[#6E3511] focus:bg-white focus:outline-none transition min-h-[42px]"
             />
           </div>
 
           <div>
-            <label className="block text-xs md:text-sm font-bold text-[#412D15] mb-2 uppercase tracking-wide">
+            <label className="block text-xs font-bold text-[#412D15] mb-1.5 uppercase tracking-wide">
               Consignee (Recipient)
             </label>
             <input
@@ -212,18 +213,18 @@ export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({
               placeholder="e.g. Retail Store #104"
               value={recipientName}
               onChange={(e) => setRecipientName(e.target.value)}
-              className="w-full bg-[#faf6f2] text-[#412D15] border border-[#ebdcd0] rounded-xl px-4 py-3 text-sm focus:border-[#6E3511] focus:bg-white focus:outline-none transition"
+              className="w-full bg-[#faf6f2] text-[#412D15] border border-[#ebdcd0] rounded-xl px-3.5 py-2.5 text-sm focus:border-[#6E3511] focus:bg-white focus:outline-none transition min-h-[42px]"
             />
           </div>
 
           <div>
-            <label className="block text-xs md:text-sm font-bold text-[#412D15] mb-2 uppercase tracking-wide">
+            <label className="block text-xs font-bold text-[#412D15] mb-1.5 uppercase tracking-wide">
               Category
             </label>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value as Shipment['category'])}
-              className="w-full bg-[#faf6f2] text-[#412D15] font-semibold border border-[#ebdcd0] rounded-xl px-4 py-3 text-sm focus:border-[#6E3511] focus:bg-white focus:outline-none transition"
+              className="w-full bg-[#faf6f2] text-[#412D15] font-semibold border border-[#ebdcd0] rounded-xl px-3.5 py-2.5 text-sm focus:border-[#6E3511] focus:bg-white focus:outline-none transition min-h-[42px]"
             >
               <option value="Electronics">Electronics</option>
               <option value="High-Value">High-Value Cargo</option>
@@ -236,9 +237,9 @@ export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({
         </div>
 
         {/* Route Details */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-5">
           <div>
-            <label className="block text-xs md:text-sm font-bold text-[#412D15] mb-2 uppercase tracking-wide">
+            <label className="block text-xs font-bold text-[#412D15] mb-1.5 uppercase tracking-wide">
               Origin Port / Facility
             </label>
             <input
@@ -246,12 +247,12 @@ export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({
               placeholder="e.g. Shenzhen Airport Cargo"
               value={origin}
               onChange={(e) => setOrigin(e.target.value)}
-              className="w-full bg-[#faf6f2] text-[#412D15] border border-[#ebdcd0] rounded-xl px-4 py-3 text-sm focus:border-[#6E3511] focus:bg-white focus:outline-none transition"
+              className="w-full bg-[#faf6f2] text-[#412D15] border border-[#ebdcd0] rounded-xl px-3.5 py-2.5 text-sm focus:border-[#6E3511] focus:bg-white focus:outline-none transition min-h-[42px]"
             />
           </div>
 
           <div>
-            <label className="block text-xs md:text-sm font-bold text-[#412D15] mb-2 uppercase tracking-wide">
+            <label className="block text-xs font-bold text-[#412D15] mb-1.5 uppercase tracking-wide">
               Destination Terminal / Hub
             </label>
             <input
@@ -259,15 +260,15 @@ export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({
               placeholder="e.g. Delhi Air Freight Hub Gate 4"
               value={destination}
               onChange={(e) => setDestination(e.target.value)}
-              className="w-full bg-[#faf6f2] text-[#412D15] border border-[#ebdcd0] rounded-xl px-4 py-3 text-sm focus:border-[#6E3511] focus:bg-white focus:outline-none transition"
+              className="w-full bg-[#faf6f2] text-[#412D15] border border-[#ebdcd0] rounded-xl px-3.5 py-2.5 text-sm focus:border-[#6E3511] focus:bg-white focus:outline-none transition min-h-[42px]"
             />
           </div>
         </div>
 
         {/* Tolerance & Pieces */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 pt-2">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-5 pt-1">
           <div>
-            <label className="block text-xs md:text-sm font-bold text-[#412D15] mb-2 uppercase tracking-wide">
+            <label className="block text-xs font-bold text-[#412D15] mb-1.5 uppercase tracking-wide">
               Package Count (Pieces)
             </label>
             <input
@@ -275,12 +276,12 @@ export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({
               min="1"
               value={itemsCount}
               onChange={(e) => setItemsCount(parseInt(e.target.value) || 1)}
-              className="w-full bg-[#faf6f2] text-[#412D15] font-mono font-bold border border-[#ebdcd0] rounded-xl px-4 py-3 text-sm focus:border-[#6E3511] focus:bg-white focus:outline-none transition"
+              className="w-full bg-[#faf6f2] text-[#412D15] font-mono font-bold border border-[#ebdcd0] rounded-xl px-3.5 py-2.5 text-sm focus:border-[#6E3511] focus:bg-white focus:outline-none transition min-h-[42px]"
             />
           </div>
 
           <div>
-            <label className="block text-xs md:text-sm font-bold text-[#412D15] mb-2 uppercase tracking-wide flex items-center justify-between">
+            <label className="block text-xs font-bold text-[#412D15] mb-1.5 uppercase tracking-wide flex items-center justify-between">
               <span>Tolerance (% Allowed)</span>
               <span className="text-[#6E3511] font-mono font-bold text-sm">±{tolerance}%</span>
             </label>
@@ -296,20 +297,20 @@ export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({
           </div>
 
           <div>
-            <label className="block text-xs md:text-sm font-bold text-[#412D15] mb-2 uppercase tracking-wide">
+            <label className="block text-xs font-bold text-[#412D15] mb-1.5 uppercase tracking-wide">
               Attendant / Operator
             </label>
             <input
               type="text"
               value={operator}
               onChange={(e) => setOperator(e.target.value)}
-              className="w-full bg-[#faf6f2] text-[#412D15] font-semibold border border-[#ebdcd0] rounded-xl px-4 py-3 text-sm focus:border-[#6E3511] focus:bg-white focus:outline-none transition"
+              className="w-full bg-[#faf6f2] text-[#412D15] font-semibold border border-[#ebdcd0] rounded-xl px-3.5 py-2.5 text-sm focus:border-[#6E3511] focus:bg-white focus:outline-none transition min-h-[42px]"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs md:text-sm font-bold text-[#412D15] mb-2 uppercase tracking-wide">
+          <label className="block text-xs font-bold text-[#412D15] mb-1.5 uppercase tracking-wide">
             Initial Remarks & Package Condition
           </label>
           <input
@@ -317,17 +318,17 @@ export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({
             placeholder="e.g. Factory sealed, outer box intact, no tape tears"
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            className="w-full bg-[#faf6f2] text-[#412D15] border border-[#ebdcd0] rounded-xl px-4 py-3 text-sm focus:border-[#6E3511] focus:bg-white focus:outline-none transition"
+            className="w-full bg-[#faf6f2] text-[#412D15] border border-[#ebdcd0] rounded-xl px-3.5 py-2.5 text-sm focus:border-[#6E3511] focus:bg-white focus:outline-none transition min-h-[42px]"
           />
         </div>
 
-        <div className="pt-4">
+        <div className="pt-2 sm:pt-4">
           <button
             type="submit"
-            className="w-full bg-[#6E3511] hover:bg-[#582a0d] text-white font-bold py-4 px-6 rounded-xl flex items-center justify-center gap-3 transition shadow-xs text-sm md:text-base active:scale-[0.99]"
+            className="w-full bg-[#6E3511] hover:bg-[#582a0d] active:scale-[0.99] text-white font-bold py-3.5 sm:py-4 px-6 rounded-xl flex items-center justify-center gap-3 transition shadow-xs text-sm sm:text-base min-h-[50px]"
           >
-            <Scale className="w-5 h-5" />
-            Lock Inbound Weight & Register AWB
+            <Scale className="w-5 h-5 shrink-0" />
+            <span>Lock Inbound Weight & Register AWB</span>
           </button>
         </div>
       </form>

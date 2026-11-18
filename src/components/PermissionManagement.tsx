@@ -180,104 +180,104 @@ export const PermissionManagement: React.FC<PermissionManagementProps> = ({
   };
 
   return (
-    <div className="space-y-6 text-[#412D15]">
+    <div className="space-y-4 sm:space-y-6 text-[#412D15]">
       {/* Top Banner */}
-      <div className="bg-white border border-[#ebdcd0] rounded-2xl p-6 md:p-8 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-white border border-[#ebdcd0] rounded-2xl p-4 sm:p-6 md:p-8 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl md:text-2xl font-black text-[#412D15] flex items-center gap-3">
-            <ShieldCheck className="w-6 h-6 text-[#6E3511] stroke-[2]" />
-            Permission Management
+          <h2 className="text-lg sm:text-xl md:text-2xl font-black text-[#412D15] flex items-center gap-2.5">
+            <ShieldCheck className="w-5 h-5 sm:w-6 sm:h-6 text-[#6E3511] stroke-[2] shrink-0" />
+            <span>Permission Management</span>
           </h2>
-          <p className="text-sm md:text-base text-[#412D15]/70 font-normal mt-1">
+          <p className="text-xs sm:text-sm text-[#412D15]/70 font-normal mt-0.5">
             Manage user accounts (admin or user) and customize what each account can see and do.
           </p>
         </div>
 
         <button
           onClick={() => setIsCreatingNew(!isCreatingNew)}
-          className="text-xs md:text-sm bg-[#6E3511] hover:bg-[#582a0d] text-white px-4 py-2.5 rounded-xl flex items-center gap-2 transition self-start sm:self-auto font-bold shadow-xs active:scale-95"
+          className="text-xs sm:text-sm bg-[#6E3511] hover:bg-[#582a0d] active:bg-[#412D15] text-white px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 transition self-start sm:self-auto font-bold shadow-xs min-h-[42px]"
         >
-          <UserPlus className="w-4 h-4" />
+          <UserPlus className="w-4 h-4 shrink-0" />
           <span>{isCreatingNew ? 'Close Form' : '+ Add Account'}</span>
         </button>
       </div>
 
       {feedbackMessage && (
-        <div className={`p-4 rounded-xl flex items-center gap-3 text-sm animate-fadeIn ${
+        <div className={`p-3.5 sm:p-4 rounded-xl flex items-center gap-2.5 text-xs sm:text-sm animate-fadeIn ${
           feedbackMessage.type === 'success' 
             ? 'bg-emerald-50 border border-emerald-200 text-emerald-800' 
             : 'bg-rose-50 border border-rose-200 text-rose-800'
         }`}>
-          {feedbackMessage.type === 'success' ? <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" /> : <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />}
+          {feedbackMessage.type === 'success' ? <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" /> : <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />}
           <span className="font-medium">{feedbackMessage.text}</span>
         </div>
       )}
 
       {/* New Account Creation Form */}
       {isCreatingNew && (
-        <div className="bg-white border border-[#ebdcd0] rounded-2xl p-6 md:p-8 shadow-xs animate-fadeIn">
-          <h3 className="text-sm font-bold text-[#412D15] uppercase tracking-wider mb-4 flex items-center gap-2">
-            <UserPlus className="w-5 h-5 text-[#6E3511]" />
-            Create Account (Category: Admin or User)
+        <div className="bg-white border border-[#ebdcd0] rounded-2xl p-4 sm:p-6 md:p-8 shadow-xs animate-fadeIn">
+          <h3 className="text-xs sm:text-sm font-bold text-[#412D15] uppercase tracking-wider mb-3.5 flex items-center gap-2">
+            <UserPlus className="w-4 h-4 sm:w-5 sm:h-5 text-[#6E3511]" />
+            <span>Create Account (Category: Admin or User)</span>
           </h3>
-          <form onSubmit={handleCreateUser} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+          <form onSubmit={handleCreateUser} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3.5 sm:gap-4 text-sm">
             <div>
-              <label className="block text-[#412D15] font-bold uppercase text-xs mb-1.5">Username *</label>
+              <label className="block text-[#412D15] font-bold uppercase text-[11px] mb-1">Username *</label>
               <input
                 type="text"
                 required
                 placeholder="e.g. gate_operator_2"
                 value={newUsername}
                 onChange={(e) => setNewUsername(e.target.value)}
-                className="w-full bg-[#faf6f2] text-[#412D15] font-mono font-bold border border-[#ebdcd0] rounded-xl px-3.5 py-2.5 focus:border-[#6E3511] focus:bg-white focus:outline-none"
+                className="w-full bg-[#faf6f2] text-[#412D15] font-mono font-bold border border-[#ebdcd0] rounded-xl px-3.5 py-2.5 text-xs sm:text-sm focus:border-[#6E3511] focus:bg-white focus:outline-none min-h-[42px]"
               />
             </div>
 
             <div>
-              <label className="block text-[#412D15] font-bold uppercase text-xs mb-1.5">Display Name *</label>
+              <label className="block text-[#412D15] font-bold uppercase text-[11px] mb-1">Display Name *</label>
               <input
                 type="text"
                 required
                 placeholder="e.g. Alex Ray"
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
-                className="w-full bg-[#faf6f2] text-[#412D15] border border-[#ebdcd0] rounded-xl px-3.5 py-2.5 focus:border-[#6E3511] focus:bg-white focus:outline-none"
+                className="w-full bg-[#faf6f2] text-[#412D15] border border-[#ebdcd0] rounded-xl px-3.5 py-2.5 text-xs sm:text-sm focus:border-[#6E3511] focus:bg-white focus:outline-none min-h-[42px]"
               />
             </div>
 
             <div>
-              <label className="block text-[#412D15] font-bold uppercase text-xs mb-1.5">Password</label>
+              <label className="block text-[#412D15] font-bold uppercase text-[11px] mb-1">Password</label>
               <input
                 type="text"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full bg-[#faf6f2] text-[#412D15] border border-[#ebdcd0] rounded-xl px-3.5 py-2.5 focus:border-[#6E3511] focus:bg-white focus:outline-none"
+                className="w-full bg-[#faf6f2] text-[#412D15] border border-[#ebdcd0] rounded-xl px-3.5 py-2.5 text-xs sm:text-sm focus:border-[#6E3511] focus:bg-white focus:outline-none min-h-[42px]"
               />
             </div>
 
             <div>
-              <label className="block text-[#412D15] font-bold uppercase text-xs mb-1.5">Category (Role)</label>
+              <label className="block text-[#412D15] font-bold uppercase text-[11px] mb-1">Category (Role)</label>
               <select
                 value={newRole}
                 onChange={(e) => setNewRole(e.target.value as 'admin' | 'user')}
-                className="w-full bg-[#faf6f2] text-[#412D15] font-semibold border border-[#ebdcd0] rounded-xl px-3.5 py-2.5 focus:border-[#6E3511] focus:bg-white focus:outline-none"
+                className="w-full bg-[#faf6f2] text-[#412D15] font-semibold border border-[#ebdcd0] rounded-xl px-3.5 py-2.5 text-xs sm:text-sm focus:border-[#6E3511] focus:bg-white focus:outline-none min-h-[42px]"
               >
                 <option value="user">user</option>
                 <option value="admin">admin</option>
               </select>
             </div>
 
-            <div className="sm:col-span-2 md:col-span-4 flex justify-end gap-3 pt-3">
+            <div className="sm:col-span-2 md:col-span-4 flex justify-end gap-2.5 pt-2">
               <button
                 type="button"
                 onClick={() => setIsCreatingNew(false)}
-                className="px-4 py-2 rounded-xl text-[#412D15]/75 hover:text-[#412D15] border border-[#ebdcd0] font-semibold"
+                className="px-4 py-2 rounded-xl text-[#412D15]/75 hover:text-[#412D15] border border-[#ebdcd0] font-semibold text-xs sm:text-sm min-h-[40px]"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-5 py-2 bg-[#6E3511] hover:bg-[#582a0d] text-white rounded-xl font-bold shadow-xs"
+                className="px-5 py-2 bg-[#6E3511] hover:bg-[#582a0d] active:bg-[#412D15] text-white rounded-xl font-bold shadow-xs text-xs sm:text-sm min-h-[40px]"
               >
                 Save Account
               </button>
@@ -286,10 +286,41 @@ export const PermissionManagement: React.FC<PermissionManagementProps> = ({
         </div>
       )}
 
+      {/* Mobile-Only Account Selector Carousel: fast 1-tap switching without having to scroll down */}
+      <div className="lg:hidden bg-white border border-[#ebdcd0] rounded-2xl p-3 shadow-xs">
+        <div className="text-xs font-bold text-[#412D15]/70 uppercase tracking-wide mb-2 flex items-center justify-between">
+          <span>Switch Account to Manage:</span>
+          <span className="font-mono text-[#6E3511] font-bold">{accounts.length} Total</span>
+        </div>
+        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+          {accounts.map(acc => {
+            const isSelected = selectedAccount?.id === acc.id;
+            return (
+              <button
+                key={acc.id}
+                onClick={() => setSelectedAccountId(acc.id)}
+                className={`px-3 py-2 rounded-xl text-xs font-mono font-bold whitespace-nowrap border shrink-0 transition flex items-center gap-1.5 ${
+                  isSelected
+                    ? 'bg-[#6E3511] text-white border-[#6E3511] shadow-2xs'
+                    : 'bg-[#faf6f2] text-[#412D15] border-[#ebdcd0] hover:bg-[#f6eee7]'
+                }`}
+              >
+                <span>@{acc.username}</span>
+                <span className={`text-[10px] px-1.5 py-0.2 rounded uppercase ${
+                  isSelected ? 'bg-black/25 text-white' : 'bg-[#ebdcd0] text-[#412D15]'
+                }`}>
+                  {acc.role}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Main Split Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left: Accounts Roster */}
-        <div className="lg:col-span-4 bg-white border border-[#ebdcd0] rounded-2xl p-6 shadow-xs">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6">
+        {/* Left: Accounts Roster (Hidden on Mobile because of the mobile strip above) */}
+        <div className="hidden lg:block lg:col-span-4 bg-white border border-[#ebdcd0] rounded-2xl p-5 sm:p-6 shadow-xs">
           <div className="text-xs font-bold text-[#412D15]/70 uppercase tracking-wider mb-4 flex items-center justify-between">
             <span>Accounts ({accounts.length})</span>
             <Users className="w-4 h-4 text-[#6E3511]" />
@@ -304,7 +335,7 @@ export const PermissionManagement: React.FC<PermissionManagementProps> = ({
                 <div
                   key={acc.id}
                   onClick={() => setSelectedAccountId(acc.id)}
-                  className={`p-4 rounded-xl border cursor-pointer transition flex items-center justify-between ${
+                  className={`p-3.5 sm:p-4 rounded-xl border cursor-pointer transition flex items-center justify-between ${
                     isSelected 
                       ? 'bg-[#6E3511] text-white border-[#6E3511] shadow-xs' 
                       : 'bg-[#faf6f2] border-[#ebdcd0] hover:border-[#dfcebf] hover:bg-[#f6eee7]'
@@ -356,29 +387,29 @@ export const PermissionManagement: React.FC<PermissionManagementProps> = ({
         </div>
 
         {/* Right: Permission Toggles Matrix */}
-        <div className="lg:col-span-8 bg-white border border-[#ebdcd0] rounded-2xl p-6 md:p-8 shadow-xs">
+        <div className="lg:col-span-8 bg-white border border-[#ebdcd0] rounded-2xl p-4 sm:p-6 md:p-8 shadow-xs">
           {selectedAccount ? (
             <div>
-              <div className="flex flex-wrap items-center justify-between gap-3 pb-5 mb-5 border-b border-[#ebdcd0]">
+              <div className="flex flex-wrap items-center justify-between gap-2.5 pb-4 sm:pb-5 mb-4 sm:mb-5 border-b border-[#ebdcd0]">
                 <div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-lg md:text-xl font-bold font-mono text-[#412D15]">@{selectedAccount.username}</span>
-                    <span className="text-xs font-mono px-2.5 py-1 rounded bg-[#faf6f2] text-[#412D15] font-bold border border-[#ebdcd0]">
-                      category: {selectedAccount.role}
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-base sm:text-lg md:text-xl font-bold font-mono text-[#412D15]">@{selectedAccount.username}</span>
+                    <span className="text-xs font-mono px-2 py-0.5 rounded bg-[#faf6f2] text-[#412D15] font-bold border border-[#ebdcd0]">
+                      {selectedAccount.role}
                     </span>
                   </div>
-                  <div className="text-xs md:text-sm text-[#412D15]/70 font-medium mt-1">
+                  <div className="text-xs text-[#412D15]/70 font-medium mt-0.5">
                     {selectedAccount.name}
                   </div>
                 </div>
 
-                <div className="text-xs md:text-sm text-[#412D15]/70 font-mono">
+                <div className="text-xs sm:text-sm text-[#412D15]/70 font-mono">
                   Allowed Modules: <strong className="text-[#6E3511] font-bold">{Object.values(selectedAccount.permissions).filter(Boolean).length} / {MODULE_DEFINITIONS.length}</strong>
                 </div>
               </div>
 
               {/* Module Permissions Toggles */}
-              <div className="space-y-3">
+              <div className="space-y-2.5 sm:space-y-3">
                 {MODULE_DEFINITIONS.map(mod => {
                   const isEnabled = selectedAccount.permissions[mod.key];
 
@@ -386,28 +417,28 @@ export const PermissionManagement: React.FC<PermissionManagementProps> = ({
                     <div
                       key={mod.key}
                       onClick={() => handleTogglePermission(mod.key)}
-                      className={`p-4 md:p-5 rounded-xl border cursor-pointer transition flex items-center justify-between gap-4 ${
+                      className={`p-3.5 sm:p-5 rounded-xl border cursor-pointer transition flex items-center justify-between gap-3 ${
                         isEnabled
                           ? 'bg-[#faf6f2] border-[#ebdcd0] shadow-2xs'
                           : 'bg-white border-[#ebdcd0] hover:border-[#dfcebf]'
                       }`}
                     >
-                      <div className="flex items-start gap-4">
-                        <div className={`p-2.5 rounded-xl border mt-0.5 shrink-0 ${
+                      <div className="flex items-start gap-3 sm:gap-4 min-w-0">
+                        <div className={`p-2 sm:p-2.5 rounded-xl border mt-0.5 shrink-0 ${
                           isEnabled 
                             ? 'bg-[#6E3511] text-white border-[#6E3511]' 
                             : 'bg-[#faf6f2] text-[#412D15]/40 border-[#ebdcd0]'
                         }`}>
                           {mod.icon}
                         </div>
-                        <div>
-                          <div className="flex items-center gap-3">
-                            <span className={`text-sm md:text-base font-bold ${
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2 truncate">
+                            <span className={`text-xs sm:text-sm md:text-base font-bold truncate ${
                               isEnabled ? 'text-[#412D15]' : 'text-[#412D15]/50'
                             }`}>
                               {mod.title}
                             </span>
-                            <span className={`text-xs font-mono uppercase px-2 py-0.5 rounded font-bold ${
+                            <span className={`text-[10px] sm:text-xs font-mono uppercase px-1.5 sm:px-2 py-0.5 rounded font-bold shrink-0 ${
                               isEnabled 
                                 ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' 
                                 : 'bg-[#faf6f2] text-[#412D15]/50 border border-[#ebdcd0]'
@@ -415,19 +446,19 @@ export const PermissionManagement: React.FC<PermissionManagementProps> = ({
                               {isEnabled ? 'Enabled' : 'Disabled'}
                             </span>
                           </div>
-                          <p className="text-xs md:text-sm text-[#412D15]/70 mt-1">
+                          <p className="text-[11px] sm:text-xs md:text-sm text-[#412D15]/70 mt-0.5 line-clamp-2">
                             {mod.description}
                           </p>
                         </div>
                       </div>
 
                       {/* Custom Toggle Switch */}
-                      <div className="shrink-0">
-                        <div className={`w-12 h-6 rounded-full transition relative p-0.5 ${
+                      <div className="shrink-0 ml-2">
+                        <div className={`w-11 sm:w-12 h-6 rounded-full transition relative p-0.5 ${
                           isEnabled ? 'bg-[#6E3511]' : 'bg-[#ebdcd0]'
                         }`}>
                           <div className={`w-5 h-5 rounded-full bg-white transition transform ${
-                            isEnabled ? 'translate-x-6' : 'translate-x-0'
+                            isEnabled ? 'translate-x-5 sm:translate-x-6' : 'translate-x-0'
                           } shadow-xs`} />
                         </div>
                       </div>
@@ -437,7 +468,7 @@ export const PermissionManagement: React.FC<PermissionManagementProps> = ({
               </div>
             </div>
           ) : (
-            <div className="py-12 text-center text-[#412D15]/60 text-sm">
+            <div className="py-12 text-center text-[#412D15]/60 text-xs sm:text-sm">
               Select an account on the left to configure module permissions.
             </div>
           )}
