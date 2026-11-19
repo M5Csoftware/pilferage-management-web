@@ -13,7 +13,6 @@ import {
 } from 'lucide-react';
 import { 
   Shipment, 
-  INITIAL_SHIPMENTS, 
   AuthUser, 
   UserAccount, 
   INITIAL_USER_ACCOUNTS,
@@ -39,6 +38,12 @@ import {
   getUserAccountsFromDb, 
   upsertUserAccountInDb 
 } from '@/lib/supabase';
+import {
+  isServerOnline,
+  fetchShipmentsFromServer,
+  createInboundOnServer,
+  recordDispatchOnServer
+} from '@/lib/serverApi';
 
 export default function Home() {
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
@@ -48,6 +53,35 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<NavTab>('inbound');
   const [inspectShipment, setInspectShipment] = useState<Shipment | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [serverOnline, setServerOnline] = useState<boolean>(false);
+  const [isSyncing, setIsSyncing] = useState<boolean>(false);
+
+  const syncShipments = async () => {
+    setIsSyncing(true);
+    try {
+      const online = await isServerOnline();
+      setServerOnline(online);
+      if (online) {
+        const serverData = await fetchShipmentsFromServer();
+        if (serverData && Array.isArray(serverData)) {
+          setShipments(serverData);
+          localStorage.setItem('PMS_SHIPMENTS_V2', JSON.stringify(serverData));
+          setIsSyncing(false);
+          return;
+        }
+      }
+
+      if (isSupabaseConfigured) {
+        const dbShipments = await getShipmentsFromDb();
+        if (dbShipments && Array.isArray(dbShipments)) {
+          setShipments(dbShipments);
+          localStorage.setItem('PMS_SHIPMENTS_V2', JSON.stringify(dbShipments));
+        }
+      }
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   useEffect(() => {
     const savedAccounts = localStorage.getItem('PMS_ACCOUNTS_V3');
@@ -88,13 +122,14 @@ export default function Home() {
     const savedShipments = localStorage.getItem('PMS_SHIPMENTS_V2');
     if (savedShipments) {
       try {
-        setShipments(JSON.parse(savedShipments));
+        const parsed = JSON.parse(savedShipments);
+        setShipments(Array.isArray(parsed) ? parsed : []);
       } catch (e) {
-        setShipments(INITIAL_SHIPMENTS);
+        setShipments([]);
       }
     } else {
-      setShipments(INITIAL_SHIPMENTS);
-      localStorage.setItem('PMS_SHIPMENTS_V2', JSON.stringify(INITIAL_SHIPMENTS));
+      setShipments([]);
+      localStorage.setItem('PMS_SHIPMENTS_V2', JSON.stringify([]));
     }
 
     const savedSettings = localStorage.getItem('PMS_SETTINGS');
@@ -106,17 +141,13 @@ export default function Home() {
       }
     }
 
-    // Connect to Supabase live database if configured
+    // Connect and sync with live database / server
+    syncShipments();
+
     if (isSupabaseConfigured) {
       getUserAccountsFromDb().then(dbAccounts => {
         if (dbAccounts && dbAccounts.length > 0) {
           setAccounts(dbAccounts);
-        }
-      });
-
-      getShipmentsFromDb().then(dbShipments => {
-        if (dbShipments && dbShipments.length > 0) {
-          setShipments(dbShipments);
         }
       });
     }
@@ -176,9 +207,15 @@ export default function Home() {
   const handleShipmentRecorded = (newShipment: Shipment) => {
     const updated = [newShipment, ...shipments];
     saveShipments(updated);
+
+    // Sync to Fastify server
+    createInboundOnServer(newShipment).catch(() => {});
+
+    // Sync to Supabase if configured
     if (isSupabaseConfigured) {
-      insertShipmentToDb(newShipment);
+      insertShipmentToDb(newShipment).catch(() => {});
     }
+
     if (currentUser?.permissions?.dispatch) {
       setActiveTab('dispatch');
     }
@@ -187,14 +224,14 @@ export default function Home() {
   const handleUpdateShipment = (updatedShipment: Shipment) => {
     const updated = shipments.map((s) => (s.id === updatedShipment.id ? updatedShipment : s));
     saveShipments(updated);
-    if (isSupabaseConfigured) {
-      updateShipmentInDb(updatedShipment);
-    }
-  };
 
-  const resetToSampleData = () => {
-    saveShipments(INITIAL_SHIPMENTS);
-    setInspectShipment(null);
+    // Sync to Fastify server
+    recordDispatchOnServer(updatedShipment).catch(() => {});
+
+    // Sync to Supabase if configured
+    if (isSupabaseConfigured) {
+      updateShipmentInDb(updatedShipment).catch(() => {});
+    }
   };
 
   if (!currentUser) {
@@ -276,19 +313,26 @@ export default function Home() {
             )}
 
             <div className="hidden xs:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#faf6f2] border border-[#ebdcd0] text-xs font-semibold">
-              <span className={`w-2 h-2 rounded-full ${isSupabaseConfigured ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+              <span className={`w-2 h-2 rounded-full ${
+                serverOnline 
+                  ? 'bg-emerald-500 animate-pulse' 
+                  : isSupabaseConfigured 
+                    ? 'bg-emerald-500 animate-pulse' 
+                    : 'bg-amber-500'
+              }`} />
               <span className="text-[11px] font-mono text-[#412D15]">
-                {isSupabaseConfigured ? 'Supabase' : 'Offline'}
+                {serverOnline ? 'Server API' : isSupabaseConfigured ? 'Supabase' : 'Local Storage'}
               </span>
             </div>
 
             <button
-              onClick={resetToSampleData}
-              title="Reset sample data"
-              className="text-xs sm:text-sm text-[#412D15] hover:text-[#6E3511] p-2 sm:px-3.5 sm:py-2 rounded-xl bg-[#faf6f2] hover:bg-[#f6eee7] border border-[#ebdcd0] flex items-center gap-1.5 sm:gap-2 transition font-bold min-h-[38px]"
+              onClick={syncShipments}
+              disabled={isSyncing}
+              title="Sync with database"
+              className="text-xs sm:text-sm text-[#412D15] hover:text-[#6E3511] p-2 sm:px-3.5 sm:py-2 rounded-xl bg-[#faf6f2] hover:bg-[#f6eee7] border border-[#ebdcd0] flex items-center gap-1.5 sm:gap-2 transition font-bold min-h-[38px] disabled:opacity-50"
             >
-              <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#6E3511]" />
-              <span className="hidden md:inline">Reset Demo</span>
+              <RefreshCw className={`w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#6E3511] ${isSyncing ? 'animate-spin' : ''}`} />
+              <span className="hidden md:inline">{isSyncing ? 'Syncing...' : 'Sync'}</span>
             </button>
 
             {/* User role & handle pill */}

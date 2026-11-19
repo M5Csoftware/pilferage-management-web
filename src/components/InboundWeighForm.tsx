@@ -29,31 +29,17 @@ export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({
   const [awbNumber, setAwbNumber] = useState('');
   const [senderName, setSenderName] = useState('');
   const [recipientName, setRecipientName] = useState('');
-  const [origin, setOrigin] = useState('Shenzhen Freight Port');
-  const [destination, setDestination] = useState('Delhi Cargo Terminal Hub');
-  const [category, setCategory] = useState<Shipment['category']>('Electronics');
+  const [origin, setOrigin] = useState('');
+  const [destination, setDestination] = useState('');
+  const [category, setCategory] = useState<Shipment['category']>('General Freight');
   const [itemsCount, setItemsCount] = useState<number>(1);
   const [weightInKg, setWeightInKg] = useState<string>('');
-  const [operator, setOperator] = useState(currentUser.name || 'Scale Operator 1');
+  const [operator, setOperator] = useState(currentUser.name || '');
   const [sealNumber, setSealNumber] = useState('');
   const [tolerance, setTolerance] = useState<number>(settings.defaultTolerancePercentage);
   const [notes, setNotes] = useState('');
   const [weightInPhotoUrl, setWeightInPhotoUrl] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
-
-  const handleFillDemo = () => {
-    const randomAwb = Math.floor(10000000 + Math.random() * 90000000);
-    setAwbNumber(`AWB-${randomAwb}`);
-    setSenderName('Shenzhen Global Electronics Ltd');
-    setRecipientName('Nexus Warehousing Tech Hub');
-    setOrigin('Hong Kong International HKG-Air');
-    setDestination(settings.hubName);
-    setCategory('Electronics');
-    setItemsCount(48);
-    setWeightInKg((85.40 + Math.random() * 12).toFixed(2));
-    setSealNumber(`SEAL-${Math.floor(100000 + Math.random() * 900000)}`);
-    setTolerance(settings.defaultTolerancePercentage);
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,19 +51,19 @@ export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({
     const newShipment: Shipment = {
       id: `SHP-${Math.floor(10000 + Math.random() * 90000)}`,
       awbNumber: awbNumber.trim().toUpperCase(),
-      senderName: senderName || 'Declared Freight Forwarder',
-      recipientName: recipientName || 'Target Receiver Facility',
-      origin: origin || 'Local Gateway',
-      destination: destination || settings.hubName,
+      senderName: senderName.trim(),
+      recipientName: recipientName.trim(),
+      origin: origin.trim(),
+      destination: destination.trim(),
       category,
       itemsCount: itemsCount || 1,
       tolerancePercentage: tolerance,
       inboundDate: new Date().toISOString().replace('T', ' ').substring(0, 16),
       weightInKg: parseFloat(weightInKg),
-      inboundOperator: operator,
-      sealNumberIn: sealNumber || `SEAL-${Math.floor(10000 + Math.random() * 90000)}`,
-      inboundNotes: notes,
-      weightInPhotoUrl: weightInPhotoUrl || undefined,
+      inboundOperator: operator.trim(),
+      sealNumberIn: sealNumber.trim() || undefined,
+      inboundNotes: notes.trim() || undefined,
+      weightInPhotoUrl: weightInPhotoUrl.trim() || undefined,
       status: 'INBOUND_RECORDED'
     };
 
@@ -87,6 +73,10 @@ export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({
       setIsSuccess(false);
       setAwbNumber('');
       setWeightInKg('');
+      setSenderName('');
+      setRecipientName('');
+      setOrigin('');
+      setDestination('');
       setSealNumber('');
       setNotes('');
       setWeightInPhotoUrl('');
@@ -102,24 +92,13 @@ export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({
             <PackagePlus className="w-5 h-5 sm:w-6 sm:h-6 text-[#6E3511] stroke-[2] shrink-0" />
             <span>Inbound Intake & Weight Recording</span>
           </h2>
-          <p className="text-xs sm:text-sm text-[#412D15]/70 font-normal mt-1">
-            Record arrival AWB scale reading and security seal to lock baseline weight.
-          </p>
         </div>
-
-        <button
-          type="button"
-          onClick={handleFillDemo}
-          className="w-full sm:w-auto text-xs sm:text-sm bg-[#faf6f2] hover:bg-[#f6eee7] active:bg-[#ebdcd0] text-[#412D15] border border-[#ebdcd0] px-3.5 py-2.5 rounded-xl flex items-center justify-center gap-2 transition font-bold shadow-2xs min-h-[42px]"
-        >
-          <Sparkles className="w-4 h-4 text-[#6E3511] shrink-0" /> Auto-Fill Sample AWB
-        </button>
       </div>
 
       {isSuccess && (
         <div className="mb-5 p-3.5 sm:p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-2.5 text-emerald-800 text-xs sm:text-sm animate-fadeIn">
           <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-600 shrink-0" />
-          <span className="font-medium">Inbound weight logged successfully. Baseline is secured in audit ledger.</span>
+          <span className="font-medium">Inbound weight recorded successfully.</span>
         </div>
       )}
 
@@ -168,9 +147,6 @@ export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({
                 <Scale className="w-4 h-4 sm:w-5 sm:h-5 text-[#6E3511]" />
                 Arrival Scale Reading (Weight In) *
               </label>
-              <p className="text-[11px] sm:text-xs text-[#412D15]/70 font-normal mt-0.5">
-                Ensure scale tare reads exactly 0.00 kg before placing consignment.
-              </p>
             </div>
 
             <div className="flex items-center gap-3 w-full sm:w-auto">

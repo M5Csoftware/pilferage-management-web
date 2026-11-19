@@ -567,19 +567,25 @@ export const DiscrepancyDashboard: React.FC<DiscrepancyDashboardProps> = ({
                       {/* 8. Audit Memo / Clearance Remarks */}
                       <td className="px-4 py-3.5 max-w-[240px] border-r border-[#ebdcd0]">
                         {isFlagged ? (
-                          <div className="text-[11px] text-rose-900 bg-rose-50/70 p-2 rounded-lg border border-rose-200">
-                            <strong className="block font-bold truncate">Security Memo:</strong>
-                            <p className="line-clamp-2 leading-tight mt-0.5">
-                              {item.flaggedReason || item.outboundNotes || 'Weight shortfall logged.'}
-                            </p>
-                          </div>
+                          item.flaggedReason || item.outboundNotes ? (
+                            <div className="text-[11px] text-rose-900 bg-rose-50/70 p-2 rounded-lg border border-rose-200">
+                              <p className="line-clamp-2 leading-tight">
+                                {item.flaggedReason || item.outboundNotes}
+                              </p>
+                            </div>
+                          ) : (
+                            <span className="text-[#412D15]/40 text-xs">—</span>
+                          )
                         ) : (
-                          <div className="text-[11px] text-emerald-900 bg-emerald-50/60 p-2 rounded-lg border border-emerald-200">
-                            <strong className="block font-bold text-emerald-800">Clearance Stamp:</strong>
-                            <p className="line-clamp-2 leading-tight mt-0.5">
-                              {item.outboundNotes || 'Verified tare match within allowable tolerance. Released.'}
-                            </p>
-                          </div>
+                          item.outboundNotes ? (
+                            <div className="text-[11px] text-emerald-900 bg-emerald-50/60 p-2 rounded-lg border border-emerald-200">
+                              <p className="line-clamp-2 leading-tight">
+                                {item.outboundNotes}
+                              </p>
+                            </div>
+                          ) : (
+                            <span className="text-[#412D15]/40 text-xs">—</span>
+                          )
                         )}
                       </td>
 
