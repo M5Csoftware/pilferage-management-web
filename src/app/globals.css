@@ -7,32 +7,34 @@
   --accent-secondary: #412D15;
 }
 
-body {
+html, body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-size: 16px;
-  line-height: 1.6;
+  line-height: 1.5;
+  overflow-x: hidden;
+  width: 100%;
 }
 
-/* Crisp, high-contrast typography helper classes */
+/* Numeric alignment helper */
 .font-numeric {
   font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-feature-settings: "tnum" 1, "cv05" 1;
 }
 
-/* Selection highlight using primary accent */
+/* Accent Selection */
 ::selection {
   background-color: #6E3511;
   color: #ffffff;
 }
 
-/* Smooth subtle scrollbars */
+/* Custom slim scrollbars */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
   background: #f3ede7;
@@ -43,6 +45,29 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #6E3511;
+}
+
+/* Hide scrollbar for mobile swipe bars */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Mobile viewport touch enhancements & eliminate double-tap delay */
+button, a, input, select, textarea {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Safe area support for modern phones (iPhone home bar, dynamic island) */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+}
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 0px);
 }
 
 @media print {

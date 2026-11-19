@@ -144,6 +144,10 @@ export interface Shipment {
   weightDiffKg?: number;
   weightLossPercentage?: number;
   flaggedReason?: string;
+
+  // Photo Evidence
+  weightInPhotoUrl?: string;
+  weightOutPhotoUrl?: string;
 }
 
 export interface MasterTallySummary {
@@ -200,7 +204,9 @@ export const INITIAL_SHIPMENTS: Shipment[] = [
     weightDiffKg: -2.90,
     weightLossPercentage: -6.44,
     flaggedReason: "CRITICAL: Weight deficit exceeds safe tolerance (6.44% loss, 2.90 kg missing). Suspected box tampering & item removal.",
-    outboundNotes: "Bottom seam tape slit and taped over with clear packaging tape. Security audit hold raised."
+    outboundNotes: "Bottom seam tape slit and taped over with clear packaging tape. Security audit hold raised.",
+    weightInPhotoUrl: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=800&q=80",
+    weightOutPhotoUrl: "https://images.unsplash.com/photo-1580674285054-bed31e145f59?auto=format&fit=crop&w=800&q=80"
   },
   {
     id: "SHP-98216",

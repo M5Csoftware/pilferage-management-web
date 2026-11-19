@@ -5,7 +5,11 @@ import {
   ShieldAlert, 
   RefreshCw,
   Menu,
-  Lock
+  Lock,
+  PackagePlus,
+  Truck,
+  LayoutDashboard,
+  ClipboardList
 } from 'lucide-react';
 import { 
   Shipment, 
@@ -27,6 +31,14 @@ import { MasterReport } from '@/components/MasterReport';
 import { PermissionManagement } from '@/components/PermissionManagement';
 import { SettingsView } from '@/components/SettingsView';
 import { WeightComparisonCard } from '@/components/WeightComparisonCard';
+import { 
+  isSupabaseConfigured, 
+  getShipmentsFromDb, 
+  insertShipmentToDb, 
+  updateShipmentInDb, 
+  getUserAccountsFromDb, 
+  upsertUserAccountInDb 
+} from '@/lib/supabase';
 
 export default function Home() {
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
@@ -93,6 +105,21 @@ export default function Home() {
         setSettings(DEFAULT_SETTINGS);
       }
     }
+
+    // Connect to Supabase live database if configured
+    if (isSupabaseConfigured) {
+      getUserAccountsFromDb().then(dbAccounts => {
+        if (dbAccounts && dbAccounts.length > 0) {
+          setAccounts(dbAccounts);
+        }
+      });
+
+      getShipmentsFromDb().then(dbShipments => {
+        if (dbShipments && dbShipments.length > 0) {
+          setShipments(dbShipments);
+        }
+      });
+    }
   }, []);
 
   const handleLoginSuccess = (user: AuthUser) => {
@@ -112,6 +139,10 @@ export default function Home() {
   const handleUpdateAccounts = (newAccounts: UserAccount[]) => {
     setAccounts(newAccounts);
     localStorage.setItem('PMS_ACCOUNTS_V3', JSON.stringify(newAccounts));
+
+    if (isSupabaseConfigured) {
+      newAccounts.forEach(acc => upsertUserAccountInDb(acc));
+    }
 
     if (currentUser) {
       const me = newAccounts.find(a => a.id === currentUser.id);
@@ -145,6 +176,9 @@ export default function Home() {
   const handleShipmentRecorded = (newShipment: Shipment) => {
     const updated = [newShipment, ...shipments];
     saveShipments(updated);
+    if (isSupabaseConfigured) {
+      insertShipmentToDb(newShipment);
+    }
     if (currentUser?.permissions?.dispatch) {
       setActiveTab('dispatch');
     }
@@ -153,6 +187,9 @@ export default function Home() {
   const handleUpdateShipment = (updatedShipment: Shipment) => {
     const updated = shipments.map((s) => (s.id === updatedShipment.id ? updatedShipment : s));
     saveShipments(updated);
+    if (isSupabaseConfigured) {
+      updateShipmentInDb(updatedShipment);
+    }
   };
 
   const resetToSampleData = () => {
@@ -179,7 +216,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#faf8f5] text-[#412D15] flex font-sans selection:bg-[#6E3511] selection:text-white">
-      {/* Sidebar with wider layout (w-72) */}
+      {/* Sidebar with responsive slide-in drawer */}
       <Sidebar
         currentTab={activeSafeTab}
         onTabChange={(tab) => {
@@ -195,28 +232,28 @@ export default function Home() {
 
       {/* Main Content Area */}
       <div className="flex-1 lg:pl-72 flex flex-col min-h-screen overflow-x-hidden">
-        {/* Top Header Bar */}
-        <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-[#ebdcd0] px-6 sm:px-8 h-20 flex items-center justify-between print:hidden shadow-2xs">
-          {/* Left: Mobile menu & Title */}
-          <div className="flex items-center gap-4">
+        {/* Top Header Bar (Mobile Friendly) */}
+        <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-[#ebdcd0] px-3.5 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between print:hidden shadow-2xs">
+          {/* Left: Mobile menu button & Module Title */}
+          <div className="flex items-center gap-2.5 sm:gap-4 min-w-0">
             <button
               onClick={() => setIsMobileMenuOpen(true)}
-              className="lg:hidden p-2 text-[#412D15] hover:text-[#6E3511] rounded-xl hover:bg-[#faf6f2] transition"
+              className="lg:hidden p-2 text-[#412D15] hover:text-[#6E3511] rounded-xl hover:bg-[#faf6f2] active:bg-[#f6eee7] transition shrink-0 min-w-[40px] min-h-[40px] flex items-center justify-center"
               aria-label="Toggle menu"
             >
-              <Menu className="w-6 h-6" />
+              <Menu className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
 
-            <div>
-              <div className="text-xs font-bold text-[#412D15]/60 uppercase tracking-wider hidden sm:block">
+            <div className="min-w-0">
+              <div className="text-[10px] sm:text-xs font-bold text-[#412D15]/60 uppercase tracking-wider hidden xs:block truncate">
                 Terminal Gate • {settings.terminalCode}
               </div>
-              <h1 className="text-lg sm:text-xl md:text-2xl font-black text-[#412D15] tracking-tight flex items-center gap-2">
-                {activeSafeTab === 'dashboard' && 'Discrepancy & Tally Dashboard'}
-                {activeSafeTab === 'inbound' && 'AWB Weight In (Intake Station)'}
-                {activeSafeTab === 'dispatch' && 'AWB Weight Out & Gate Re-Weigh'}
-                {activeSafeTab === 'audit' && 'Chain-of-Custody Audit Ledger'}
-                {activeSafeTab === 'report' && 'Master Weight & Cargo Audit Report'}
+              <h1 className="text-sm xs:text-base sm:text-xl md:text-2xl font-black text-[#412D15] tracking-tight truncate max-w-[170px] xs:max-w-[260px] sm:max-w-none">
+                {activeSafeTab === 'dashboard' && 'Dashboard & Tally'}
+                {activeSafeTab === 'inbound' && 'AWB Weight In'}
+                {activeSafeTab === 'dispatch' && 'Weight Out & Gate Check'}
+                {activeSafeTab === 'audit' && 'Chain-of-Custody Audit'}
+                {activeSafeTab === 'report' && 'Master Cargo Report'}
                 {activeSafeTab === 'permissions' && 'Permission Management'}
                 {activeSafeTab === 'settings' && 'Password Reset'}
               </h1>
@@ -224,34 +261,41 @@ export default function Home() {
           </div>
 
           {/* Right: Actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {currentUser?.permissions?.dashboard && pilferageCount > 0 && (
               <button
                 onClick={() => setActiveTab('dashboard')}
-                className="flex items-center gap-2 bg-rose-50 border border-rose-200 text-rose-800 px-3.5 py-2 rounded-xl text-xs md:text-sm font-bold animate-pulse shadow-2xs"
+                className="flex items-center gap-1.5 sm:gap-2 bg-rose-50 border border-rose-200 text-rose-800 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold animate-pulse shadow-2xs min-h-[38px]"
               >
-                <ShieldAlert className="w-4 h-4 text-rose-600" />
+                <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0" />
                 <span className="hidden sm:inline">
                   {pilferageCount} Discrepanc{pilferageCount > 1 ? 'ies' : 'y'}
                 </span>
-                <span className="sm:hidden">{pilferageCount}</span>
+                <span className="sm:hidden font-mono">{pilferageCount}</span>
               </button>
             )}
+
+            <div className="hidden xs:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#faf6f2] border border-[#ebdcd0] text-xs font-semibold">
+              <span className={`w-2 h-2 rounded-full ${isSupabaseConfigured ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+              <span className="text-[11px] font-mono text-[#412D15]">
+                {isSupabaseConfigured ? 'Supabase' : 'Offline'}
+              </span>
+            </div>
 
             <button
               onClick={resetToSampleData}
               title="Reset sample data"
-              className="text-xs md:text-sm text-[#412D15] hover:text-[#6E3511] p-2 sm:px-3.5 sm:py-2 rounded-xl bg-[#faf6f2] hover:bg-[#f6eee7] border border-[#ebdcd0] flex items-center gap-2 transition font-bold"
+              className="text-xs sm:text-sm text-[#412D15] hover:text-[#6E3511] p-2 sm:px-3.5 sm:py-2 rounded-xl bg-[#faf6f2] hover:bg-[#f6eee7] border border-[#ebdcd0] flex items-center gap-1.5 sm:gap-2 transition font-bold min-h-[38px]"
             >
-              <RefreshCw className="w-4 h-4 text-[#6E3511]" />
-              <span className="hidden sm:inline">Reset Demo</span>
+              <RefreshCw className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#6E3511]" />
+              <span className="hidden md:inline">Reset Demo</span>
             </button>
 
             {/* User role & handle pill */}
-            <div className="hidden sm:flex items-center gap-2 pl-3 border-l border-[#ebdcd0] text-sm">
-              <span className="text-[#412D15] font-bold">@{currentUser.username}</span>
+            <div className="hidden sm:flex items-center gap-2 pl-2 sm:pl-3 border-l border-[#ebdcd0] text-sm">
+              <span className="text-[#412D15] font-bold truncate max-w-[100px]">@{currentUser.username}</span>
               <span
-                className={`text-xs font-bold font-mono px-2.5 py-0.5 rounded uppercase ${
+                className={`text-xs font-bold font-mono px-2 py-0.5 rounded uppercase ${
                   isAdmin
                     ? 'bg-[#6E3511] text-white'
                     : 'bg-[#ebdcd0] text-[#412D15]'
@@ -263,10 +307,10 @@ export default function Home() {
           </div>
         </header>
 
-        {/* Main View Container with generous whitespace padding */}
-        <main className="flex-1 p-6 sm:p-8 lg:p-10 max-w-7xl w-full mx-auto">
+        {/* Main View Container with mobile-adapted padding (p-3.5 sm:p-6 lg:p-10) */}
+        <main className="flex-1 p-3.5 sm:p-6 lg:p-10 pb-24 lg:pb-10 max-w-7xl w-full mx-auto">
           {!isCurrentTabAllowed && (
-            <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-center gap-3 text-amber-900 text-sm">
+            <div className="mb-4 sm:mb-6 p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-center gap-3 text-amber-900 text-sm">
               <Lock className="w-5 h-5 text-amber-600 shrink-0" />
               <span>
                 Access Restricted: Your user account (@{currentUser.username}) is not authorized to view this module.
@@ -326,16 +370,16 @@ export default function Home() {
               />
 
               {inspectShipment && (
-                <div className="mt-8 border-t border-[#ebdcd0] pt-8">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg md:text-xl font-black text-[#412D15]">
+                <div className="mt-6 sm:mt-8 border-t border-[#ebdcd0] pt-6 sm:pt-8">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                    <h3 className="text-base sm:text-lg md:text-xl font-black text-[#412D15] truncate">
                       Inspecting AWB:{' '}
                       <span className="font-mono text-[#6E3511]">{inspectShipment.awbNumber}</span> (
                       {inspectShipment.id})
                     </h3>
                     <button
                       onClick={() => setInspectShipment(null)}
-                      className="text-sm text-[#412D15] hover:text-[#6E3511] bg-white px-4 py-2 rounded-xl border border-[#ebdcd0] font-bold shadow-2xs"
+                      className="self-start sm:self-auto text-xs sm:text-sm text-[#412D15] hover:text-[#6E3511] bg-white px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-xl border border-[#ebdcd0] font-bold shadow-2xs"
                     >
                       Close Inspection
                     </button>
@@ -383,10 +427,84 @@ export default function Home() {
           )}
         </main>
 
+        {/* Mobile Persistent Bottom Bar (For quick warehouse thumb navigation) */}
+        <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#ebdcd0] px-2 py-1.5 flex items-center justify-around shadow-lg">
+          {hasAccessToTab('inbound') && (
+            <button
+              onClick={() => {
+                setActiveTab('inbound');
+                setInspectShipment(null);
+              }}
+              className={`flex flex-col items-center justify-center p-1.5 rounded-xl transition flex-1 min-h-[48px] ${
+                activeSafeTab === 'inbound' ? 'text-[#6E3511] font-bold' : 'text-[#412D15]/60 hover:text-[#412D15]'
+              }`}
+            >
+              <PackagePlus className={`w-5 h-5 ${activeSafeTab === 'inbound' ? 'stroke-[2.2]' : 'stroke-[1.75]'}`} />
+              <span className="text-[10px] mt-0.5">Weight In</span>
+            </button>
+          )}
+
+          {hasAccessToTab('dispatch') && (
+            <button
+              onClick={() => {
+                setActiveTab('dispatch');
+                setInspectShipment(null);
+              }}
+              className={`flex flex-col items-center justify-center p-1.5 rounded-xl transition flex-1 min-h-[48px] ${
+                activeSafeTab === 'dispatch' ? 'text-[#6E3511] font-bold' : 'text-[#412D15]/60 hover:text-[#412D15]'
+              }`}
+            >
+              <Truck className={`w-5 h-5 ${activeSafeTab === 'dispatch' ? 'stroke-[2.2]' : 'stroke-[1.75]'}`} />
+              <span className="text-[10px] mt-0.5">Weight Out</span>
+            </button>
+          )}
+
+          {hasAccessToTab('dashboard') && (
+            <button
+              onClick={() => {
+                setActiveTab('dashboard');
+                setInspectShipment(null);
+              }}
+              className={`flex flex-col items-center justify-center p-1.5 rounded-xl transition flex-1 min-h-[48px] relative ${
+                activeSafeTab === 'dashboard' ? 'text-[#6E3511] font-bold' : 'text-[#412D15]/60 hover:text-[#412D15]'
+              }`}
+            >
+              <LayoutDashboard className={`w-5 h-5 ${activeSafeTab === 'dashboard' ? 'stroke-[2.2]' : 'stroke-[1.75]'}`} />
+              <span className="text-[10px] mt-0.5">Dashboard</span>
+              {pilferageCount > 0 && (
+                <span className="absolute top-1 right-2 w-2 h-2 rounded-full bg-rose-500" />
+              )}
+            </button>
+          )}
+
+          {hasAccessToTab('audit') && (
+            <button
+              onClick={() => {
+                setActiveTab('audit');
+                setInspectShipment(null);
+              }}
+              className={`flex flex-col items-center justify-center p-1.5 rounded-xl transition flex-1 min-h-[48px] ${
+                activeSafeTab === 'audit' ? 'text-[#6E3511] font-bold' : 'text-[#412D15]/60 hover:text-[#412D15]'
+              }`}
+            >
+              <ClipboardList className={`w-5 h-5 ${activeSafeTab === 'audit' ? 'stroke-[2.2]' : 'stroke-[1.75]'}`} />
+              <span className="text-[10px] mt-0.5">Audit</span>
+            </button>
+          )}
+
+          <button
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="flex flex-col items-center justify-center p-1.5 rounded-xl transition flex-1 text-[#412D15]/60 hover:text-[#412D15] min-h-[48px]"
+          >
+            <Menu className="w-5 h-5 stroke-[1.75]" />
+            <span className="text-[10px] mt-0.5">Menu</span>
+          </button>
+        </nav>
+
         {/* Footer */}
-        <footer className="border-t border-[#ebdcd0] bg-white py-5 text-center text-xs md:text-sm text-[#412D15]/70 print:hidden mt-auto">
-          <div className="max-w-7xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-2">
-            <span>PMS (Pilferage Management System) • Air Cargo Weight Verification Gate</span>
+        <footer className="border-t border-[#ebdcd0] bg-white py-4 sm:py-5 text-center text-xs text-[#412D15]/70 print:hidden mt-auto">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-1 sm:gap-2">
+            <span>PMS (Pilferage Management System) • Air Cargo Verification Gate</span>
             <span>
               Signed in as: <strong className="text-[#412D15]">@{currentUser.username}</strong> ({currentUser.role})
             </span>
