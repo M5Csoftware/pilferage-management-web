@@ -91,9 +91,7 @@ export async function getShipmentsFromDb(): Promise<Shipment[] | null> {
     }
 
     if (!data || data.length === 0) {
-      // Seed initial demo data into Supabase if empty
-      await seedShipmentsIfEmpty();
-      return INITIAL_SHIPMENTS;
+      return [];
     }
 
     return data.map(mapDbToShipment);
@@ -222,17 +220,6 @@ export async function deleteUserAccountFromDb(id: string): Promise<boolean> {
   } catch (err) {
     console.error('deleteUserAccountFromDb exception:', err);
     return false;
-  }
-}
-
-// Helper: Seed initial shipments if table is completely empty
-async function seedShipmentsIfEmpty() {
-  if (!supabase) return;
-  try {
-    const payloads = INITIAL_SHIPMENTS.map(mapShipmentToDb);
-    await supabase.from('shipments').insert(payloads);
-  } catch (e) {
-    // ignore
   }
 }
 

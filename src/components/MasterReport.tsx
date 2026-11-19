@@ -270,15 +270,15 @@ export const MasterReport: React.FC<MasterReportProps> = ({
 
         {/* Ledger Table (Horizontally Scrollable on Mobile) */}
         <div className="overflow-x-auto rounded-xl border border-[#ebdcd0] -mx-1 sm:mx-0">
-          <table className="w-full text-left text-xs sm:text-sm min-w-[600px]">
+          <table className="w-full text-left text-xs sm:text-sm min-w-[600px] border-collapse">
             <thead className="bg-[#faf6f2] text-[#412D15] uppercase font-bold border-b border-[#ebdcd0] text-[11px]">
-              <tr>
-                <th className="p-3">AWB & Consignment</th>
-                <th className="p-3">Route</th>
-                <th className="p-3">Category</th>
-                <th className="p-3 text-right">Inbound (kg)</th>
-                <th className="p-3 text-right">Outbound (kg)</th>
-                <th className="p-3 text-right">Variance</th>
+              <tr className="divide-x divide-[#ebdcd0]">
+                <th className="p-3 border-r border-[#ebdcd0]">AWB & Consignment</th>
+                <th className="p-3 border-r border-[#ebdcd0]">Route</th>
+                <th className="p-3 border-r border-[#ebdcd0]">Category</th>
+                <th className="p-3 text-right border-r border-[#ebdcd0]">Inbound (kg)</th>
+                <th className="p-3 text-right border-r border-[#ebdcd0]">Outbound (kg)</th>
+                <th className="p-3 text-right border-r border-[#ebdcd0]">Variance</th>
                 <th className="p-3">Verdict</th>
               </tr>
             </thead>
@@ -290,35 +290,35 @@ export const MasterReport: React.FC<MasterReportProps> = ({
                 return (
                   <tr 
                     key={item.id}
-                    className={`hover:bg-[#faf6f2] ${
+                    className={`divide-x divide-[#ebdcd0] hover:bg-[#faf6f2] ${
                       isPilfered ? 'bg-rose-50/60' : ''
                     }`}
                   >
-                    <td className="p-3">
+                    <td className="p-3 border-r border-[#ebdcd0]">
                       <div className="font-mono font-bold text-[#412D15] text-xs sm:text-sm">{item.awbNumber}</div>
                       <div className="text-[10px] sm:text-xs text-[#412D15]/70 truncate max-w-[140px]">{item.senderName}</div>
                     </td>
 
-                    <td className="p-3 text-[11px] text-[#412D15]/75">
+                    <td className="p-3 text-[11px] text-[#412D15]/75 border-r border-[#ebdcd0]">
                       <div className="truncate max-w-[120px]">{item.origin}</div>
                       <div className="text-[#412D15]/50 truncate max-w-[120px]">→ {item.destination}</div>
                     </td>
 
-                    <td className="p-3">
+                    <td className="p-3 border-r border-[#ebdcd0]">
                       <span className="px-2 py-0.5 rounded bg-[#faf6f2] text-[#412D15] text-[10px] sm:text-xs border border-[#ebdcd0] font-semibold whitespace-nowrap">
                         {item.category}
                       </span>
                     </td>
 
-                    <td className="p-3 text-right font-mono font-bold text-[#412D15]">
+                    <td className="p-3 text-right font-mono font-bold text-[#412D15] border-r border-[#ebdcd0]">
                       {item.weightInKg.toFixed(2)}
                     </td>
 
-                    <td className="p-3 text-right font-mono font-bold text-[#412D15]">
+                    <td className="p-3 text-right font-mono font-bold text-[#412D15] border-r border-[#ebdcd0]">
                       {item.weightOutKg !== undefined ? item.weightOutKg.toFixed(2) : '—'}
                     </td>
 
-                    <td className="p-3 text-right font-mono whitespace-nowrap">
+                    <td className="p-3 text-right font-mono whitespace-nowrap border-r border-[#ebdcd0]">
                       {item.weightDiffKg !== undefined ? (
                         <span className={`font-bold ${
                           isPilfered ? 'text-rose-700' : 'text-emerald-700'

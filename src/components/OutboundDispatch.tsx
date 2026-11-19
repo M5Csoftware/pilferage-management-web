@@ -5,8 +5,6 @@ import {
   Truck, 
   Search, 
   Scale, 
-  CheckCircle, 
-  Zap,
   ListFilter
 } from 'lucide-react';
 import { Shipment, AuthUser } from '@/types/shipment';
@@ -37,18 +35,6 @@ export const OutboundDispatch: React.FC<OutboundDispatchProps> = ({
 
   const parsedScale = parseFloat(scaleReading) || 0;
 
-  const handleSimulateNormalWeight = () => {
-    if (!selectedShipment) return;
-    const simulated = +(selectedShipment.weightInKg * 0.9985).toFixed(2);
-    setScaleReading(simulated.toString());
-  };
-
-  const handleSimulatePilferageTheft = () => {
-    if (!selectedShipment) return;
-    const simulated = +(selectedShipment.weightInKg * 0.85).toFixed(2);
-    setScaleReading(simulated.toString());
-  };
-
   const handleClearDispatch = (weightOut: number, notes: string, outboundPhotoUrl?: string) => {
     if (!selectedShipment) return;
     const diff = +(weightOut - selectedShipment.weightInKg).toFixed(2);
@@ -59,7 +45,7 @@ export const OutboundDispatch: React.FC<OutboundDispatchProps> = ({
       weightOutKg: weightOut,
       outboundDate: new Date().toISOString().replace('T', ' ').substring(0, 16),
       outboundOperator: currentUser.name,
-      outboundNotes: notes || 'Verified weight consistency within permissible limits. Cleared for courier.',
+      outboundNotes: notes.trim() || undefined,
       weightDiffKg: diff,
       weightLossPercentage: pct,
       weightOutPhotoUrl: outboundPhotoUrl || selectedShipment.weightOutPhotoUrl,
@@ -79,8 +65,8 @@ export const OutboundDispatch: React.FC<OutboundDispatchProps> = ({
       ...selectedShipment,
       weightOutKg: weightOut,
       outboundDate: new Date().toISOString().replace('T', ' ').substring(0, 16),
-      outboundOperator: `${currentUser.name} (Security Hold)`,
-      outboundNotes: notes || 'Discrepancy flagged. Security team alerted for physical carton audit.',
+      outboundOperator: `${currentUser.name} (Hold)`,
+      outboundNotes: notes.trim() || undefined,
       weightDiffKg: diff,
       weightLossPercentage: pct,
       flaggedReason: reason,
@@ -102,14 +88,6 @@ export const OutboundDispatch: React.FC<OutboundDispatchProps> = ({
               <Truck className="w-5 h-5 sm:w-6 sm:h-6 text-[#6E3511] stroke-[2] shrink-0" />
               <span>Outbound Dispatch & Re-Weigh Gate</span>
             </h2>
-            <p className="text-xs sm:text-sm text-[#412D15]/70 font-normal mt-1">
-              Re-weigh packages on departure scale to verify zero cargo tampering before vehicle departure.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2 bg-[#faf6f2] px-3.5 py-1.5 rounded-xl border border-[#ebdcd0] text-xs self-start sm:self-auto font-medium">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse" />
-            <span className="text-[#412D15] font-mono font-bold">Port: {settings.scaleComPort}</span>
           </div>
         </div>
       </div>
@@ -254,28 +232,6 @@ export const OutboundDispatch: React.FC<OutboundDispatchProps> = ({
                     <h3 className="text-base sm:text-lg md:text-xl font-black text-[#412D15] mt-1.5 truncate">
                       Place AWB <span className="font-mono text-[#6E3511]">{selectedShipment.awbNumber}</span> on Scale
                     </h3>
-                  </div>
-
-                  {/* Simulator / Test Controls */}
-                  <div className="flex flex-wrap items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={handleSimulateNormalWeight}
-                      className="text-xs bg-emerald-50 text-emerald-800 border border-emerald-300 hover:bg-emerald-100 active:bg-emerald-200 px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition font-bold min-h-[36px]"
-                      title="Simulate normal weight match"
-                    >
-                      <CheckCircle className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                      <span>Simulate Safe</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleSimulatePilferageTheft}
-                      className="text-xs bg-rose-50 text-rose-800 border border-rose-300 hover:bg-rose-100 active:bg-rose-200 px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition font-bold min-h-[36px]"
-                      title="Simulate stolen contents"
-                    >
-                      <Zap className="w-3.5 h-3.5 text-rose-600 shrink-0" />
-                      <span>Simulate Pilferage (-15%)</span>
-                    </button>
                   </div>
                 </div>
 

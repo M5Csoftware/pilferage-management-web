@@ -220,17 +220,17 @@ export const ShipmentAuditList: React.FC<ShipmentAuditListProps> = ({
 
       {/* Responsive Table for Desktop */}
       <div className="hidden lg:block overflow-x-auto rounded-xl border border-[#ebdcd0]">
-        <table className="w-full text-left text-sm">
+        <table className="w-full text-left text-sm border-collapse">
           <thead className="bg-[#faf6f2] text-[#412D15] uppercase tracking-wider border-b border-[#ebdcd0] font-bold text-xs">
-            <tr>
-              <th className="px-5 py-4">AWB & Shipment</th>
-              <th className="px-5 py-4">Route</th>
-              <th className="px-5 py-4">Category</th>
-              <th className="px-5 py-4 text-right">Inbound (kg)</th>
-              <th className="px-5 py-4 text-right">Outbound (kg)</th>
-              <th className="px-5 py-4 text-right">Variance</th>
-              <th className="px-5 py-4">Evidence</th>
-              <th className="px-5 py-4">Status</th>
+            <tr className="divide-x divide-[#ebdcd0]">
+              <th className="px-5 py-4 border-r border-[#ebdcd0]">AWB & Shipment</th>
+              <th className="px-5 py-4 border-r border-[#ebdcd0]">Route</th>
+              <th className="px-5 py-4 border-r border-[#ebdcd0]">Category</th>
+              <th className="px-5 py-4 text-right border-r border-[#ebdcd0]">Inbound (kg)</th>
+              <th className="px-5 py-4 text-right border-r border-[#ebdcd0]">Outbound (kg)</th>
+              <th className="px-5 py-4 text-right border-r border-[#ebdcd0]">Variance</th>
+              <th className="px-5 py-4 border-r border-[#ebdcd0]">Evidence</th>
+              <th className="px-5 py-4 border-r border-[#ebdcd0]">Status</th>
               <th className="px-5 py-4 text-right">Action</th>
             </tr>
           </thead>
@@ -250,36 +250,36 @@ export const ShipmentAuditList: React.FC<ShipmentAuditListProps> = ({
                 return (
                   <tr 
                     key={item.id}
-                    className={`transition hover:bg-[#faf6f2] ${
+                    className={`divide-x divide-[#ebdcd0] transition hover:bg-[#faf6f2] ${
                       isFlagged ? 'bg-rose-50/50' : ''
                     }`}
                   >
-                    <td className="px-5 py-4">
+                    <td className="px-5 py-4 border-r border-[#ebdcd0]">
                       <div className="font-mono font-bold text-[#412D15] text-sm">{item.awbNumber}</div>
                       <div className="text-xs text-[#412D15]/75 font-medium">{item.senderName}</div>
                       <div className="text-[11px] text-[#412D15]/50 font-mono">{item.id}</div>
                     </td>
 
-                    <td className="px-5 py-4 text-xs text-[#412D15]/75">
+                    <td className="px-5 py-4 text-xs text-[#412D15]/75 border-r border-[#ebdcd0]">
                       <div>{item.origin}</div>
                       <div className="text-[#412D15]/50">→ {item.destination}</div>
                     </td>
 
-                    <td className="px-5 py-4">
+                    <td className="px-5 py-4 border-r border-[#ebdcd0]">
                       <span className="px-2.5 py-1 rounded bg-[#faf6f2] text-[#412D15] border border-[#ebdcd0] text-xs font-semibold">
                         {item.category}
                       </span>
                     </td>
 
-                    <td className="px-5 py-4 text-right font-mono font-bold text-[#412D15] text-base">
+                    <td className="px-5 py-4 text-right font-mono font-bold text-[#412D15] text-base border-r border-[#ebdcd0]">
                       {item.weightInKg.toFixed(2)}
                     </td>
 
-                    <td className="px-5 py-4 text-right font-mono font-bold text-[#412D15] text-base">
+                    <td className="px-5 py-4 text-right font-mono font-bold text-[#412D15] text-base border-r border-[#ebdcd0]">
                       {item.weightOutKg !== undefined ? item.weightOutKg.toFixed(2) : '—'}
                     </td>
 
-                    <td className="px-5 py-4 text-right font-mono">
+                    <td className="px-5 py-4 text-right font-mono border-r border-[#ebdcd0]">
                       {item.weightDiffKg !== undefined ? (
                         <span className={`font-black text-sm ${
                           isFlagged ? 'text-rose-600' : 'text-emerald-700'
@@ -292,7 +292,7 @@ export const ShipmentAuditList: React.FC<ShipmentAuditListProps> = ({
                     </td>
 
                     {/* Photo Evidence Column */}
-                    <td className="px-5 py-4">
+                    <td className="px-5 py-4 border-r border-[#ebdcd0]">
                       <div className="flex items-center gap-1.5">
                         {item.weightInPhotoUrl ? (
                           <button
@@ -352,7 +352,7 @@ export const ShipmentAuditList: React.FC<ShipmentAuditListProps> = ({
                       </div>
                     </td>
 
-                    <td className="px-5 py-4">
+                    <td className="px-5 py-4 border-r border-[#ebdcd0]">
                       {isFlagged && (
                         <span className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full bg-rose-100 text-rose-800 border border-rose-200">
                           <ShieldAlert className="w-3.5 h-3.5" /> Flagged
