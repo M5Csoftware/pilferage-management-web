@@ -10,6 +10,8 @@ import {
   EyeOff
 } from 'lucide-react';
 import { AuthUser, UserAccount } from '@/types/shipment';
+import { getCloudinaryConfig } from '@/lib/cloudinary';
+import { Cloud, Check, Copy } from 'lucide-react';
 
 interface SettingsViewProps {
   currentUser: AuthUser;
@@ -198,6 +200,63 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
             </button>
           </div>
         </form>
+      </div>
+
+      {/* Cloudinary Storage Setup Status Banner */}
+      <div className="bg-white border border-[#ebdcd0] rounded-2xl p-4 sm:p-6 shadow-xs">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-[#faf6f2] border border-[#ebdcd0] flex items-center justify-center text-[#6E3511]">
+              <Cloud className="w-4 h-4 stroke-[2.2]" />
+            </div>
+            <div>
+              <h3 className="text-sm sm:text-base font-black text-[#412D15]">
+                Cloudinary Storage Integration
+              </h3>
+              <p className="text-[11px] text-[#412D15]/70">
+                Persistent 25 GB free cloud photo evidence tier
+              </p>
+            </div>
+          </div>
+
+          <span className={`text-[10px] sm:text-xs font-bold px-2.5 py-1 rounded-full border ${
+            getCloudinaryConfig().isConfigured 
+              ? 'bg-emerald-50 text-emerald-800 border-emerald-200' 
+              : 'bg-amber-50 text-amber-800 border-amber-200'
+          }`}>
+            {getCloudinaryConfig().isConfigured ? '🟢 Connected' : '🟡 Keys Pending in .env'}
+          </span>
+        </div>
+
+        {getCloudinaryConfig().isConfigured ? (
+          <div className="p-3 bg-emerald-50/60 border border-emerald-200 rounded-xl text-xs text-emerald-900 space-y-1">
+            <div className="font-bold flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700" />
+              Cloudinary is configured and ready for live uploads!
+            </div>
+            <div className="font-mono text-[11px] text-emerald-800">
+              Cloud Name: <strong>{getCloudinaryConfig().cloudName}</strong> • Preset: <strong>{getCloudinaryConfig().uploadPreset}</strong>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-3 text-xs text-[#412D15]">
+            <p className="text-[#412D15]/80 text-[11px] sm:text-xs leading-relaxed">
+              When ready, paste your free Cloudinary credentials into your <code className="font-mono font-bold bg-[#faf6f2] px-1 py-0.5 rounded border border-[#ebdcd0]">.env.local</code> file:
+            </p>
+
+            <div className="bg-[#24170c] text-amber-100/90 font-mono text-[11px] p-3 rounded-xl border border-[#412D15] space-y-1">
+              <div><span className="text-amber-400">NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME</span>=your_cloud_name</div>
+              <div><span className="text-amber-400">NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET</span>=your_unsigned_preset</div>
+            </div>
+
+            <div className="bg-[#faf6f2] p-3 rounded-xl border border-[#ebdcd0] text-[11px] text-[#412D15]/80 space-y-1">
+              <strong className="text-[#412D15] block">Quick 2-minute steps:</strong>
+              <div>1. Sign up for free at <span className="font-mono text-[#6E3511]">cloudinary.com</span> (No credit card needed).</div>
+              <div>2. Copy your <strong>Cloud Name</strong> from the Cloudinary dashboard.</div>
+              <div>3. In Cloudinary <strong>Settings $\rightarrow$ Upload $\rightarrow$ Upload presets</strong>, click <strong>Add upload preset</strong>, set Signing Mode to <strong>Unsigned</strong>, and click Save.</div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { Shipment, AuthUser } from '@/types/shipment';
 import { SystemSettings } from '@/types/settings';
+import { PhotoCaptureInput } from './PhotoCaptureInput';
 
 interface InboundWeighFormProps {
   onShipmentRecorded: (shipment: Shipment) => void;
@@ -37,6 +38,7 @@ export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({
   const [sealNumber, setSealNumber] = useState('');
   const [tolerance, setTolerance] = useState<number>(settings.defaultTolerancePercentage);
   const [notes, setNotes] = useState('');
+  const [weightInPhotoUrl, setWeightInPhotoUrl] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
 
   const handleFillDemo = () => {
@@ -75,6 +77,7 @@ export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({
       inboundOperator: operator,
       sealNumberIn: sealNumber || `SEAL-${Math.floor(10000 + Math.random() * 90000)}`,
       inboundNotes: notes,
+      weightInPhotoUrl: weightInPhotoUrl || undefined,
       status: 'INBOUND_RECORDED'
     };
 
@@ -86,6 +89,7 @@ export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({
       setWeightInKg('');
       setSealNumber('');
       setNotes('');
+      setWeightInPhotoUrl('');
     }, 2000);
   };
 
@@ -188,6 +192,18 @@ export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({
             </div>
           </div>
         </div>
+
+        {/* Photo Evidence Capture (Cloudinary / Direct Mobile Camera) */}
+        <PhotoCaptureInput
+          label="Arrival Weight & Package Photo Evidence"
+          sublabel="Snap the digital scale display and intact security seal for baseline proof."
+          value={weightInPhotoUrl}
+          onChange={setWeightInPhotoUrl}
+          folder="pms_inbound"
+          tag="inbound_weight"
+          awbNumber={awbNumber}
+          stageName="Inbound Arrival"
+        />
 
         {/* Logistics Context */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 sm:gap-5">

@@ -1,18 +1,27 @@
+'use client';
+
 import React, { useState } from 'react';
 import { 
   ShieldAlert, 
   Scale, 
   CheckCircle2, 
   AlertTriangle, 
-  Info
+  Info,
+  Camera,
+  Eye,
+  FileImage,
+  ExternalLink
 } from 'lucide-react';
 import { Shipment } from '@/types/shipment';
+import { getOptimizedImageUrl } from '@/lib/cloudinary';
+import { PhotoCaptureInput } from './PhotoCaptureInput';
+import { PhotoLightboxModal } from './PhotoLightboxModal';
 
 interface WeightComparisonCardProps {
   shipment: Shipment;
   testWeightOut?: number;
-  onClearDispatch?: (weightOut: number, notes: string) => void;
-  onFlagPilferage?: (weightOut: number, notes: string, reason: string) => void;
+  onClearDispatch?: (weightOut: number, notes: string, outboundPhotoUrl?: string) => void;
+  onFlagPilferage?: (weightOut: number, notes: string, reason: string, outboundPhotoUrl?: string) => void;
 }
 
 export const WeightComparisonCard: React.FC<WeightComparisonCardProps> = ({
@@ -32,6 +41,24 @@ export const WeightComparisonCard: React.FC<WeightComparisonCardProps> = ({
   const exceedsTolerance = isWeightDeficit && absLossPercent > shipment.tolerancePercentage;
 
   const [notes, setNotes] = useState(shipment.outboundNotes || '');
+  const [outboundPhoto, setOutboundPhoto] = useState(shipment.weightOutPhotoUrl || '');
+  const [lightboxData, setLightboxData] = useState<{
+    isOpen: boolean;
+    url: string;
+    title: string;
+    subtitle?: string;
+    stage?: 'Inbound Arrival' | 'Outbound Dispatch' | 'Inspection';
+    weightKg?: number;
+    operator?: string;
+    seal?: string;
+    date?: string;
+  }>({
+    isOpen: false,
+    url: '',
+    title: '',
+  });
+
+  const isDispatchActionable = Boolean(onClearDispatch || onFlagPilferage);
 
   return (
     <div className="bg-white border border-[#ebdcd0] rounded-2xl p-4 sm:p-6 md:p-8 relative overflow-hidden shadow-xs text-[#412D15]">
@@ -198,8 +225,136 @@ export const WeightComparisonCard: React.FC<WeightComparisonCardProps> = ({
         </div>
       )}
 
+      {/* Visual Photo Evidence Deck (Inbound vs Outbound Comparison) */}
+      <div className="my-5 pt-4 sm:pt-5 border-t border-[#ebdcd0]">
+        <div className="flex items-center justify-between mb-3">
+          <h4 className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-[#412D15] flex items-center gap-2">
+            <Camera className="w-4 h-4 text-[#6E3511]" />
+            <span>Photographic Evidence (Chain-of-Custody)</span>
+          </h4>
+          <span className="text-[11px] text-[#412D15]/60 font-medium">
+            Cloudinary Image Storage
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* 1. Inbound Arrival Photo */}
+          <div className="bg-[#faf6f2] border border-[#ebdcd0] rounded-xl p-3 sm:p-4">
+            <div className="flex items-center justify-between text-xs font-bold text-[#412D15] mb-2">
+              <span className="flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-600" />
+                Inbound Arrival Photo
+              </span>
+              <span className="text-[11px] font-mono text-[#412D15]/60 font-normal">
+                {shipment.weightInKg.toFixed(2)} kg
+              </span>
+            </div>
+
+            {shipment.weightInPhotoUrl ? (
+              <div 
+                onClick={() => setLightboxData({
+                  isOpen: true,
+                  url: shipment.weightInPhotoUrl!,
+                  title: `Inbound Photo Evidence • ${shipment.awbNumber}`,
+                  subtitle: `Arrival scale reading: ${shipment.weightInKg.toFixed(2)} kg • Seal: ${shipment.sealNumberIn || 'N/A'}`,
+                  stage: 'Inbound Arrival',
+                  weightKg: shipment.weightInKg,
+                  operator: shipment.inboundOperator,
+                  seal: shipment.sealNumberIn,
+                  date: shipment.inboundDate
+                })}
+                className="relative group cursor-pointer h-40 bg-[#1a120b] rounded-lg overflow-hidden border border-[#ebdcd0] flex items-center justify-center"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={getOptimizedImageUrl(shipment.weightInPhotoUrl, { width: 400, height: 300, crop: 'fill' })}
+                  alt="Inbound Evidence"
+                  className="w-full h-full object-cover transition group-hover:scale-105 duration-300"
+                />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1 text-white text-xs font-bold transition">
+                  <Eye className="w-5 h-5" />
+                  <span>Click to Inspect High-Res</span>
+                </div>
+                <div className="absolute bottom-2 left-2 right-2 bg-black/70 backdrop-blur-xs text-white text-[10px] px-2 py-1 rounded truncate">
+                  {shipment.inboundDate} • {shipment.inboundOperator}
+                </div>
+              </div>
+            ) : (
+              <div className="h-40 rounded-lg border-2 border-dashed border-[#ebdcd0] bg-white flex flex-col items-center justify-center text-center p-3 text-[#412D15]/50">
+                <FileImage className="w-7 h-7 mb-1 text-[#412D15]/40" />
+                <span className="text-xs font-medium">No arrival photo attached</span>
+                <span className="text-[10px] text-[#412D15]/40 mt-0.5">AWB was registered with weight-only entry</span>
+              </div>
+            )}
+          </div>
+
+          {/* 2. Outbound Dispatch Photo */}
+          <div className="bg-[#faf6f2] border border-[#ebdcd0] rounded-xl p-3 sm:p-4">
+            <div className="flex items-center justify-between text-xs font-bold text-[#412D15] mb-2">
+              <span className="flex items-center gap-1.5">
+                <span className={`w-2 h-2 rounded-full ${outboundPhoto ? 'bg-emerald-600' : 'bg-amber-500'}`} />
+                Outbound Dispatch Photo
+              </span>
+              <span className="text-[11px] font-mono text-[#412D15]/60 font-normal">
+                {currentWeightOut > 0 ? `${currentWeightOut.toFixed(2)} kg` : 'Pending Scale'}
+              </span>
+            </div>
+
+            {isDispatchActionable ? (
+              /* When in active dispatch re-weigh station, allow taking/uploading outbound photo */
+              <PhotoCaptureInput
+                label="Dispatch Verification Photo"
+                sublabel="Capture re-weighed box on scale & seal condition."
+                value={outboundPhoto}
+                onChange={setOutboundPhoto}
+                folder="pms_outbound"
+                tag="outbound_dispatch"
+                awbNumber={shipment.awbNumber}
+                stageName="Outbound Dispatch"
+              />
+            ) : outboundPhoto ? (
+              /* When inspecting historical record */
+              <div 
+                onClick={() => setLightboxData({
+                  isOpen: true,
+                  url: outboundPhoto,
+                  title: `Outbound Dispatch Photo • ${shipment.awbNumber}`,
+                  subtitle: `Departure scale reading: ${currentWeightOut.toFixed(2)} kg`,
+                  stage: 'Outbound Dispatch',
+                  weightKg: currentWeightOut,
+                  operator: shipment.outboundOperator,
+                  seal: shipment.sealNumberOut,
+                  date: shipment.outboundDate
+                })}
+                className="relative group cursor-pointer h-40 bg-[#1a120b] rounded-lg overflow-hidden border border-[#ebdcd0] flex items-center justify-center"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={getOptimizedImageUrl(outboundPhoto, { width: 400, height: 300, crop: 'fill' })}
+                  alt="Outbound Evidence"
+                  className="w-full h-full object-cover transition group-hover:scale-105 duration-300"
+                />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center gap-1 text-white text-xs font-bold transition">
+                  <Eye className="w-5 h-5" />
+                  <span>Click to Inspect High-Res</span>
+                </div>
+                <div className="absolute bottom-2 left-2 right-2 bg-black/70 backdrop-blur-xs text-white text-[10px] px-2 py-1 rounded truncate">
+                  {shipment.outboundDate || 'Dispatch recorded'} • {shipment.outboundOperator}
+                </div>
+              </div>
+            ) : (
+              <div className="h-40 rounded-lg border-2 border-dashed border-[#ebdcd0] bg-white flex flex-col items-center justify-center text-center p-3 text-[#412D15]/50">
+                <FileImage className="w-7 h-7 mb-1 text-[#412D15]/40" />
+                <span className="text-xs font-medium">Pending dispatch re-weigh photo</span>
+                <span className="text-[10px] text-[#412D15]/40 mt-0.5">Photo captured during outbound gate check</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
       {/* Action buttons (Mobile Full-Width Responsive) */}
-      {(onClearDispatch || onFlagPilferage) && currentWeightOut > 0 && (
+      {isDispatchActionable && currentWeightOut > 0 && (
         <div className="mt-4 sm:mt-5 pt-4 sm:pt-5 border-t border-[#ebdcd0] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           <div className="flex-1">
             <input 
@@ -217,7 +372,8 @@ export const WeightComparisonCard: React.FC<WeightComparisonCardProps> = ({
                 onClick={() => onFlagPilferage?.(
                   currentWeightOut, 
                   notes, 
-                  `Weight shortfall of ${Math.abs(diffKg)} kg (${absLossPercent}% loss) detected on outbound scale.`
+                  `Weight shortfall of ${Math.abs(diffKg)} kg (${absLossPercent}% loss) detected on outbound scale.`,
+                  outboundPhoto || undefined
                 )}
                 className="w-full sm:w-auto px-4 sm:px-5 py-2.5 sm:py-3 bg-rose-700 hover:bg-rose-800 active:bg-rose-900 text-white rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs transition min-h-[44px]"
               >
@@ -226,7 +382,7 @@ export const WeightComparisonCard: React.FC<WeightComparisonCardProps> = ({
               </button>
             ) : (
               <button
-                onClick={() => onClearDispatch?.(currentWeightOut, notes)}
+                onClick={() => onClearDispatch?.(currentWeightOut, notes, outboundPhoto || undefined)}
                 className="w-full sm:w-auto px-4 sm:px-5 py-2.5 sm:py-3 bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs transition min-h-[44px]"
               >
                 <CheckCircle2 className="w-4 h-4 shrink-0" />
@@ -236,6 +392,23 @@ export const WeightComparisonCard: React.FC<WeightComparisonCardProps> = ({
           </div>
         </div>
       )}
+
+      {/* Lightbox for zooming photos */}
+      <PhotoLightboxModal
+        isOpen={lightboxData.isOpen}
+        onClose={() => setLightboxData(prev => ({ ...prev, isOpen: false }))}
+        imageUrl={lightboxData.url}
+        title={lightboxData.title}
+        subtitle={lightboxData.subtitle}
+        metadata={{
+          awbNumber: shipment.awbNumber,
+          weightKg: lightboxData.weightKg,
+          operator: lightboxData.operator,
+          sealNumber: lightboxData.seal,
+          date: lightboxData.date,
+          stage: lightboxData.stage
+        }}
+      />
     </div>
   );
 };

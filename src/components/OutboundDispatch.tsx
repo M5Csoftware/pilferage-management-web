@@ -49,7 +49,7 @@ export const OutboundDispatch: React.FC<OutboundDispatchProps> = ({
     setScaleReading(simulated.toString());
   };
 
-  const handleClearDispatch = (weightOut: number, notes: string) => {
+  const handleClearDispatch = (weightOut: number, notes: string, outboundPhotoUrl?: string) => {
     if (!selectedShipment) return;
     const diff = +(weightOut - selectedShipment.weightInKg).toFixed(2);
     const pct = +((diff / selectedShipment.weightInKg) * 100).toFixed(2);
@@ -62,6 +62,7 @@ export const OutboundDispatch: React.FC<OutboundDispatchProps> = ({
       outboundNotes: notes || 'Verified weight consistency within permissible limits. Cleared for courier.',
       weightDiffKg: diff,
       weightLossPercentage: pct,
+      weightOutPhotoUrl: outboundPhotoUrl || selectedShipment.weightOutPhotoUrl,
       status: 'DISPATCHED_CLEARED'
     };
 
@@ -69,7 +70,7 @@ export const OutboundDispatch: React.FC<OutboundDispatchProps> = ({
     setScaleReading('');
   };
 
-  const handleFlagPilferage = (weightOut: number, notes: string, reason: string) => {
+  const handleFlagPilferage = (weightOut: number, notes: string, reason: string, outboundPhotoUrl?: string) => {
     if (!selectedShipment) return;
     const diff = +(weightOut - selectedShipment.weightInKg).toFixed(2);
     const pct = +((diff / selectedShipment.weightInKg) * 100).toFixed(2);
@@ -83,6 +84,7 @@ export const OutboundDispatch: React.FC<OutboundDispatchProps> = ({
       weightDiffKg: diff,
       weightLossPercentage: pct,
       flaggedReason: reason,
+      weightOutPhotoUrl: outboundPhotoUrl || selectedShipment.weightOutPhotoUrl,
       status: 'PILFERAGE_FLAGGED'
     };
 

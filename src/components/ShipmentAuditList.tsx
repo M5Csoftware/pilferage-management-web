@@ -8,9 +8,13 @@ import {
   Search, 
   AlertTriangle,
   Scale,
-  Eye
+  Eye,
+  Camera,
+  FileImage
 } from 'lucide-react';
 import { Shipment, AuthUser } from '@/types/shipment';
+import { getOptimizedImageUrl } from '@/lib/cloudinary';
+import { PhotoLightboxModal } from './PhotoLightboxModal';
 
 interface ShipmentAuditListProps {
   shipments: Shipment[];
@@ -25,6 +29,17 @@ export const ShipmentAuditList: React.FC<ShipmentAuditListProps> = ({
 }) => {
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
   const [search, setSearch] = useState<string>('');
+  const [lightboxData, setLightboxData] = useState<{
+    isOpen: boolean;
+    url: string;
+    title: string;
+    subtitle?: string;
+    metadata?: any;
+  }>({
+    isOpen: false,
+    url: '',
+    title: '',
+  });
 
   const filtered = shipments.filter(s => {
     const matchesFilter = 
@@ -55,7 +70,7 @@ export const ShipmentAuditList: React.FC<ShipmentAuditListProps> = ({
             <span>Consolidated Weight Audit Log</span>
           </h2>
           <p className="text-xs sm:text-sm text-[#412D15]/70 font-normal mt-0.5">
-            Complete chain-of-custody ledger comparing arrival baseline vs departure weight.
+            Complete chain-of-custody ledger comparing arrival baseline vs departure weight & photo evidence.
           </p>
         </div>
 
@@ -124,6 +139,7 @@ export const ShipmentAuditList: React.FC<ShipmentAuditListProps> = ({
             const isFlagged = item.status === 'PILFERAGE_FLAGGED';
             const isCleared = item.status === 'DISPATCHED_CLEARED';
             const isPending = item.status === 'INBOUND_RECORDED';
+            const hasPhotos = Boolean(item.weightInPhotoUrl || item.weightOutPhotoUrl);
 
             return (
               <div 
@@ -144,7 +160,13 @@ export const ShipmentAuditList: React.FC<ShipmentAuditListProps> = ({
                       {item.id}
                     </span>
                   </div>
-                  <div className="shrink-0">
+                  <div className="shrink-0 flex items-center gap-1.5">
+                    {hasPhotos && (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#faf6f2] text-[#6E3511] border border-[#ebdcd0] flex items-center gap-1">
+                        <Camera className="w-3 h-3" />
+                        {item.weightInPhotoUrl && item.weightOutPhotoUrl ? '2 Photos' : 'Photo'}
+                      </span>
+                    )}
                     {isFlagged && (
                       <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-200">
                         FLAGGED
@@ -207,6 +229,7 @@ export const ShipmentAuditList: React.FC<ShipmentAuditListProps> = ({
               <th className="px-5 py-4 text-right">Inbound (kg)</th>
               <th className="px-5 py-4 text-right">Outbound (kg)</th>
               <th className="px-5 py-4 text-right">Variance</th>
+              <th className="px-5 py-4">Evidence</th>
               <th className="px-5 py-4">Status</th>
               <th className="px-5 py-4 text-right">Action</th>
             </tr>
@@ -214,7 +237,7 @@ export const ShipmentAuditList: React.FC<ShipmentAuditListProps> = ({
           <tbody className="divide-y divide-[#ebdcd0]/70 bg-white text-[#412D15] font-medium">
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={8} className="px-5 py-10 text-center text-[#412D15]/60">
+                <td colSpan={9} className="px-5 py-10 text-center text-[#412D15]/60">
                   No shipments found matching criteria.
                 </td>
               </tr>
@@ -268,6 +291,67 @@ export const ShipmentAuditList: React.FC<ShipmentAuditListProps> = ({
                       )}
                     </td>
 
+                    {/* Photo Evidence Column */}
+                    <td className="px-5 py-4">
+                      <div className="flex items-center gap-1.5">
+                        {item.weightInPhotoUrl ? (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setLightboxData({
+                                isOpen: true,
+                                url: item.weightInPhotoUrl!,
+                                title: `Arrival Scale Photo • ${item.awbNumber}`,
+                                subtitle: `Weight In: ${item.weightInKg.toFixed(2)} kg`,
+                                metadata: {
+                                  awbNumber: item.awbNumber,
+                                  weightKg: item.weightInKg,
+                                  operator: item.inboundOperator,
+                                  date: item.inboundDate,
+                                  sealNumber: item.sealNumberIn
+                                }
+                              });
+                            }}
+                            className="p-1 rounded-lg border border-[#ebdcd0] bg-[#faf6f2] hover:bg-[#ebdcd0] transition text-[#6E3511]"
+                            title="View Inbound Arrival Photo"
+                          >
+                            <Camera className="w-4 h-4" />
+                          </button>
+                        ) : null}
+
+                        {item.weightOutPhotoUrl ? (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setLightboxData({
+                                isOpen: true,
+                                url: item.weightOutPhotoUrl!,
+                                title: `Dispatch Scale Photo • ${item.awbNumber}`,
+                                subtitle: `Weight Out: ${item.weightOutKg?.toFixed(2)} kg`,
+                                metadata: {
+                                  awbNumber: item.awbNumber,
+                                  weightKg: item.weightOutKg,
+                                  operator: item.outboundOperator,
+                                  date: item.outboundDate,
+                                  sealNumber: item.sealNumberOut
+                                }
+                              });
+                            }}
+                            className="p-1 rounded-lg border border-[#ebdcd0] bg-emerald-50 hover:bg-emerald-100 transition text-emerald-800"
+                            title="View Outbound Dispatch Photo"
+                          >
+                            <Camera className="w-4 h-4" />
+                          </button>
+                        ) : null}
+
+                        {!item.weightInPhotoUrl && !item.weightOutPhotoUrl && (
+                          <span className="text-xs text-[#412D15]/40 italic">None</span>
+                        )}
+                      </div>
+                    </td>
+
                     <td className="px-5 py-4">
                       {isFlagged && (
                         <span className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full bg-rose-100 text-rose-800 border border-rose-200">
@@ -303,6 +387,16 @@ export const ShipmentAuditList: React.FC<ShipmentAuditListProps> = ({
           </tbody>
         </table>
       </div>
+
+      {/* Lightbox for zooming photos from audit list */}
+      <PhotoLightboxModal
+        isOpen={lightboxData.isOpen}
+        onClose={() => setLightboxData(prev => ({ ...prev, isOpen: false }))}
+        imageUrl={lightboxData.url}
+        title={lightboxData.title}
+        subtitle={lightboxData.subtitle}
+        metadata={lightboxData.metadata}
+      />
     </div>
   );
 };

@@ -82,6 +82,8 @@ export const MasterReport: React.FC<MasterReportProps> = ({
       'Status',
       'Inbound Operator',
       'Outbound Operator',
+      'Weight In Photo URL',
+      'Weight Out Photo URL',
       'Notes'
     ];
 
@@ -101,6 +103,8 @@ export const MasterReport: React.FC<MasterReportProps> = ({
       `"${s.status}"`,
       `"${s.inboundOperator}"`,
       `"${s.outboundOperator || 'N/A'}"`,
+      `"${s.weightInPhotoUrl || ''}"`,
+      `"${s.weightOutPhotoUrl || ''}"`,
       `"${(s.flaggedReason || s.outboundNotes || '').replace(/"/g, '""')}"`
     ]);
 
