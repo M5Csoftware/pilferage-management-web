@@ -94,7 +94,7 @@ export const InboundWeighForm: React.FC<InboundWeighFormProps> = ({
   };
 
   return (
-    <div className="bg-white border border-[#ebdcd0] rounded-2xl p-4 sm:p-7 md:p-10 shadow-xs max-w-4xl mx-auto text-[#412D15]">
+    <div className="bg-white border border-[#ebdcd0] rounded-2xl p-4 sm:p-7 md:p-10 shadow-xs w-full max-w-6xl mx-auto text-[#412D15]">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 sm:mb-8 pb-5 sm:pb-6 border-b border-[#ebdcd0]">
         <div>

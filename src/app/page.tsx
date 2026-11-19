@@ -307,8 +307,8 @@ export default function Home() {
           </div>
         </header>
 
-        {/* Main View Container with mobile-adapted padding (p-3.5 sm:p-6 lg:p-10) */}
-        <main className="flex-1 p-3.5 sm:p-6 lg:p-10 pb-24 lg:pb-10 max-w-7xl w-full mx-auto">
+        {/* Main View Container with wide desktop layout */}
+        <main className="flex-1 p-3.5 sm:p-6 lg:p-8 xl:p-10 pb-24 lg:pb-10 w-full max-w-[1920px] mx-auto">
           {!isCurrentTabAllowed && (
             <div className="mb-4 sm:mb-6 p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-center gap-3 text-amber-900 text-sm">
               <Lock className="w-5 h-5 text-amber-600 shrink-0" />
@@ -503,7 +503,7 @@ export default function Home() {
 
         {/* Footer */}
         <footer className="border-t border-[#ebdcd0] bg-white py-4 sm:py-5 text-center text-xs text-[#412D15]/70 print:hidden mt-auto">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-1 sm:gap-2">
+          <div className="w-full max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 flex flex-col sm:flex-row items-center justify-between gap-1 sm:gap-2">
             <span>PMS (Pilferage Management System) • Air Cargo Verification Gate</span>
             <span>
               Signed in as: <strong className="text-[#412D15]">@{currentUser.username}</strong> ({currentUser.role})

@@ -371,17 +371,17 @@ export const DiscrepancyDashboard: React.FC<DiscrepancyDashboardProps> = ({
 
         {/* DETAILED DATA TABLE */}
         <div className="overflow-x-auto rounded-xl border border-[#ebdcd0] shadow-2xs">
-          <table className="w-full text-left text-xs sm:text-sm">
+          <table className="w-full text-left text-xs sm:text-sm border-collapse">
             <thead className="bg-[#faf6f2] text-[#412D15] uppercase tracking-wider border-b border-[#ebdcd0] font-black text-[11px]">
-              <tr>
-                <th className="px-4 py-3.5 whitespace-nowrap">AWB & Parcel ID</th>
-                <th className="px-4 py-3.5 whitespace-nowrap">Route (From → To)</th>
-                <th className="px-4 py-3.5 whitespace-nowrap">Category</th>
-                <th className="px-4 py-3.5 text-right whitespace-nowrap">Weight In</th>
-                <th className="px-4 py-3.5 text-right whitespace-nowrap">Weight Out</th>
-                <th className="px-4 py-3.5 text-right whitespace-nowrap">Variance (Delta)</th>
-                <th className="px-4 py-3.5 text-center whitespace-nowrap">Photo Evidence</th>
-                <th className="px-4 py-3.5 whitespace-nowrap">
+              <tr className="divide-x divide-[#ebdcd0]">
+                <th className="px-4 py-3.5 whitespace-nowrap border-r border-[#ebdcd0]">AWB & Parcel ID</th>
+                <th className="px-4 py-3.5 whitespace-nowrap border-r border-[#ebdcd0]">Route (From → To)</th>
+                <th className="px-4 py-3.5 whitespace-nowrap border-r border-[#ebdcd0]">Category</th>
+                <th className="px-4 py-3.5 text-right whitespace-nowrap border-r border-[#ebdcd0]">Weight In</th>
+                <th className="px-4 py-3.5 text-right whitespace-nowrap border-r border-[#ebdcd0]">Weight Out</th>
+                <th className="px-4 py-3.5 text-right whitespace-nowrap border-r border-[#ebdcd0]">Variance (Delta)</th>
+                <th className="px-4 py-3.5 text-center whitespace-nowrap border-r border-[#ebdcd0]">Photo Evidence</th>
+                <th className="px-4 py-3.5 whitespace-nowrap border-r border-[#ebdcd0]">
                   {activeDashboardTab === 'pilferage' ? 'Security Audit Memo' : 'Clearance Remarks'}
                 </th>
                 <th className="px-4 py-3.5 text-right whitespace-nowrap">Action</th>
@@ -416,18 +416,18 @@ export const DiscrepancyDashboard: React.FC<DiscrepancyDashboardProps> = ({
                   return (
                     <tr 
                       key={item.id}
-                      className={`transition hover:bg-[#faf6f2]/80 ${
+                      className={`divide-x divide-[#ebdcd0] transition hover:bg-[#faf6f2]/80 ${
                         isFlagged ? 'bg-rose-50/30' : ''
                       }`}
                     >
                       {/* 1. AWB & ID */}
-                      <td className="px-4 py-3.5">
+                      <td className="px-4 py-3.5 border-r border-[#ebdcd0]">
                         <div className="font-mono font-black text-sm text-[#412D15]">{item.awbNumber}</div>
                         <div className="text-[10px] text-[#412D15]/50 font-mono mt-0.5">{item.id}</div>
                       </td>
 
                       {/* 2. Route & Parties */}
-                      <td className="px-4 py-3.5">
+                      <td className="px-4 py-3.5 border-r border-[#ebdcd0]">
                         <div className="font-bold text-xs text-[#412D15] truncate max-w-[190px]">
                           {item.senderName} <span className="text-[#6E3511]">→</span> {item.recipientName}
                         </div>
@@ -438,7 +438,7 @@ export const DiscrepancyDashboard: React.FC<DiscrepancyDashboardProps> = ({
                       </td>
 
                       {/* 3. Category */}
-                      <td className="px-4 py-3.5 whitespace-nowrap">
+                      <td className="px-4 py-3.5 whitespace-nowrap border-r border-[#ebdcd0]">
                         <span className="px-2.5 py-1 rounded-md bg-[#faf6f2] text-[#412D15] border border-[#ebdcd0] text-[11px] font-bold">
                           {item.category}
                         </span>
@@ -448,7 +448,7 @@ export const DiscrepancyDashboard: React.FC<DiscrepancyDashboardProps> = ({
                       </td>
 
                       {/* 4. Weight In */}
-                      <td className="px-4 py-3.5 text-right font-mono">
+                      <td className="px-4 py-3.5 text-right font-mono border-r border-[#ebdcd0]">
                         <div className="font-black text-sm text-[#412D15]">
                           {item.weightInKg.toFixed(2)} <span className="text-[10px] font-sans font-normal text-[#412D15]/60">kg</span>
                         </div>
@@ -458,7 +458,7 @@ export const DiscrepancyDashboard: React.FC<DiscrepancyDashboardProps> = ({
                       </td>
 
                       {/* 5. Weight Out */}
-                      <td className="px-4 py-3.5 text-right font-mono">
+                      <td className="px-4 py-3.5 text-right font-mono border-r border-[#ebdcd0]">
                         {item.weightOutKg !== undefined ? (
                           <>
                             <div className="font-black text-sm text-[#412D15]">
@@ -474,7 +474,7 @@ export const DiscrepancyDashboard: React.FC<DiscrepancyDashboardProps> = ({
                       </td>
 
                       {/* 6. Variance (Delta) */}
-                      <td className="px-4 py-3.5 text-right font-mono whitespace-nowrap">
+                      <td className="px-4 py-3.5 text-right font-mono whitespace-nowrap border-r border-[#ebdcd0]">
                         {item.weightDiffKg !== undefined ? (
                           <div>
                             <div className={`font-black text-xs sm:text-sm ${
@@ -494,7 +494,7 @@ export const DiscrepancyDashboard: React.FC<DiscrepancyDashboardProps> = ({
                       </td>
 
                       {/* 7. Photo Evidence Thumbnails */}
-                      <td className="px-4 py-3.5 text-center">
+                      <td className="px-4 py-3.5 text-center border-r border-[#ebdcd0]">
                         <div className="inline-flex items-center gap-1.5 justify-center">
                           {/* Inbound Photo */}
                           {item.weightInPhotoUrl ? (
@@ -565,7 +565,7 @@ export const DiscrepancyDashboard: React.FC<DiscrepancyDashboardProps> = ({
                       </td>
 
                       {/* 8. Audit Memo / Clearance Remarks */}
-                      <td className="px-4 py-3.5 max-w-[240px]">
+                      <td className="px-4 py-3.5 max-w-[240px] border-r border-[#ebdcd0]">
                         {isFlagged ? (
                           <div className="text-[11px] text-rose-900 bg-rose-50/70 p-2 rounded-lg border border-rose-200">
                             <strong className="block font-bold truncate">Security Memo:</strong>
